@@ -156,9 +156,9 @@ async function generateNation(nationConcept, governmentType, age) {
 
     const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        temperature: 0.5,
-        presence_penalty: 0.3,
-        frequency_penalty: 0.1,
+        temperature: 0.7,
+        presence_penalty: 0.5,
+        frequency_penalty: 0.3,
         max_tokens: 4096,
         messages: [
             { role: 'system', content: systemContent },
@@ -168,26 +168,5 @@ async function generateNation(nationConcept, governmentType, age) {
 
     return completion.choices[0].message.content;
 }
-
-/*async function generateNationFlag(nationConcept, governmentType, age) {
-    const userPrompt = `
-    Eres un diseñador de banderas especializado en naciones ficticias. Tu tarea es crear una bandera para una nación ficticia dentro de un contexto histórico alternativo.
-    Ten en cuenta los siguientes elementos:
-    - **Colores:** Utiliza colores que reflejen la historia, la cultura y los valores de la nación ficticia.
-    - **Símbolos:** Incorpora símbolos, emblemas o figuras que representen la identidad nacional y los ideales de la nación ficticia.
-    - **Realismo:** Intenta que la bandera sea lo más realista posible dentro del contexto de una historia alternativa.
-    - Además ten en cuenta el tipo de gobierno y la época histórica para que la bandera sea coherente con el contexto.
-    La nación se trata de '${nationConcept}' y tiene un gobierno de tipo '${governmentType}' y existe durante la época de '${age}'.
-    `;
-
-    const response = await openai.images.generate({
-        model: "dall-e-2",
-        prompt: userPrompt,
-        n: 1,
-        size: "512x512",
-    });
-
-    return response.data[0].url;
-}*/
 
 export { generateNation };
