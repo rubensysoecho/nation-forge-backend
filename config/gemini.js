@@ -2,25 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
-const systemInstruction = ``
-
-
-const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-pro-exp-02-05",
-    systemInstruction: systemInstruction
-});
-
-const generationConfig = {
-    temperature: 1,
-    topP: 0.95,
-    topK: 64,
-    maxOutputTokens: 8192,
-    responseMimeType: "text/plain",
-};
-
-async function generateNationGemini(nationConcept, governmentType, age, optionalPrompt) {
-    model.systemInstruction = `
-        Eres un historiador profesional especializado en historia alternativa. Tu tarea es crear relatos extremadamente detallados y completamente inmersivos sobre naciones ficticias dentro de un contexto histórico alternativo. 
+const nationSystemInstruction = `Eres un historiador profesional especializado en historia alternativa. Tu tarea es crear relatos extremadamente detallados y completamente inmersivos sobre naciones ficticias dentro de un contexto histórico alternativo. 
         - **Contexto histórico:** Explica cómo surgió la nación, los eventos clave que marcaron su creación y cómo logró mantenerse a lo largo del tiempo o hasta la fecha que dicte el usuario. 
         - **Contexto geopolítico:** Describe las guerras provocadas por la existencia de la nación, las alianzas estratégicas y la expansión territorial que experimentó. Incorpora personajes ficticios importantes, como generales, diplomáticos o estrategas, relacionados con los eventos descritos. 
         - **Política:** Detalla los líderes de la nación, los sistemas de gobierno, las luchas internas y los temas nacionales más destacados. Crea figuras políticas ficticias con impacto en los eventos históricos de la nación. Ten en cuenta que tipo de gobierno que tenga el país influye en el nombre del mismo (Por ejemplo las monarquias tendrán el sobrenombre de Reino o Imperio etc..)
@@ -52,35 +34,17 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
             important_characters: ["", ""],
         };
     `
-
-    const chatSession = model.startChat({
-        generationConfig,
-    });
-
-    const prompt = `
-        Como historiador experto, explica cómo el concepto de (${nationConcept}) podría haber existido en
-        la época ('${age}') con un gobierno ('${governmentType})'.
-        Describe el contexto, el impacto en la política y la sociedad, y menciona personajes clave.
-        Sé realista y usa lenguaje preciso.
-    `
-    const result = optionalPrompt ? await chatSession.sendMessage(optionalPrompt) : await chatSession.sendMessage(prompt);
-    const responseText = result.response.text().replace(/```(json)?/g, '').trim();
-    return responseText
-}
-
-async function generateWarGemini(nationA, nationB, casusBelli, optionalPrompt) {
-    model.systemInstruction = `
+const warSystemInstruction = `
         I. Introducción y Configuración Inicial:
         Entrada de Usuario:
-        Solicita al usuario que proporcione los nombres de dos países existentes para la simulación. Deja claro que la simulación es ficticia y no representa una predicción o incitación a conflictos reales.
-        Solicita al usuario que defina un año de inicio para el conflicto (ej. 2027). Esto establecerá el contexto tecnológico y geopolítico.
-        Pide al usuario un motivo detonante del conflicto. Puede ser:
+        El usuario proporcionará los nombres de dos países existentes para la simulación. Deja claro que la simulación es ficticia y no representa una predicción o incitación a conflictos reales.
+        El usuario definirá un año de inicio para el conflicto (ej. 2027). Esto establecerá el contexto tecnológico y geopolítico.
+        El motivo detonante del conflicto puede ser introducido por el usuario u otro, ejemplos son:
         Disputa territorial (especificar el territorio).
         Conflicto de recursos (especificar el recurso).
         Crisis política/diplomática (describir brevemente).
         Incidente fronterizo (describir).
         Otro motivo (el usuario debe describirlo).
-        Pregunta al usuario por la duración deseada de la simulación (ej. "3 meses", "1 año", "hasta una resolución clara").
 
         II. Recopilación de Información (Fase de Investigación):
         Análisis de los Países:
@@ -108,8 +72,8 @@ async function generateWarGemini(nationA, nationB, casusBelli, optionalPrompt) {
         Dependencia de importaciones (especialmente de energía y alimentos).
         Alianzas: Identifica las principales alianzas militares y políticas de cada país. Considera si hay tratados de defensa mutua.
         Moral y apoyo popular: Genera una estimación (basada en suposiciones razonables y el contexto) sobre el nivel de moral de las tropas y el apoyo popular a la guerra en cada país.
+        
         III. Desarrollo de la Simulación (Fase de Ejecución):
-
         Cronología:
         Establece una cronología detallada de los eventos, dividida en fases o campañas (ej. "Fase 1: Escaramuzas fronterizas", "Fase 2: Ofensiva inicial", "Fase 3: Contraofensiva").
         Dentro de cada fase, describe los eventos clave día a día (o semana a semana, según la intensidad del conflicto).
@@ -174,16 +138,83 @@ async function generateWarGemini(nationA, nationB, casusBelli, optionalPrompt) {
         Formato: Organiza la información de forma clara y estructurada, utilizando encabezados, listas, tablas (cuando sea apropiado) y párrafos bien definidos.
         Longitud: La simulación debe ser extensa y detallada. Especifica una longitud mínima (ej. 5000 palabras) y máxima (si la hubiera).
         Adaptabilidad: Instruye a la IA para que adapte el nivel de detalle y la complejidad de la simulación según la información disponible y las capacidades del modelo.
-    `
 
-    const chatSession = model.startChat({
+        El resultado debe estar en el siguiente formato JSON (solo envía el texto en el formato, sin nada mas):
+        {
+            "aggressorCountry": {
+                "name": "",
+                "troops": "",
+                "advantages": [],
+                "disadvantages": [],
+                "equipment": [],
+                "casusBelli": ""
+            },
+            "defenderCountry": {
+                "name": "",
+                "troops": "",
+                "advantages": [],
+                "disadvantages": [],
+                "equipment": []
+            },
+            "warProgress": [],
+            "soldierView": "",
+            "kia": [],
+            "results": "",
+            "winner": ""
+        }
+
+        Para aclarar, definiré los componentes más abstractos: 
+        - warProgress: incluirá algo así {"day": "23-25", "events": ["An attack occurred on Madrid", "Protests for peace", etc...]},
+       - importantBattles: representará con todo detalle las tácticas utilizadas en esa batalla y una representación realista de la misma
+        - soldierView: incluirá un String con una narración que incluirá la visión de un soldado normal en la guerra, en 1a persona
+        - kia: una lista con las bajas humanas de un bando y de otro
+        - results: consecuencias de la guerra, por ejemplo, anexión de territorio, derechos de recursos etc..
+        - winner: la nación ganadora
+    `
+    
+const nationModel = genAI.getGenerativeModel({
+    model: "gemini-2.0-pro-exp-02-05",
+    systemInstruction: nationSystemInstruction
+});
+
+const warModel = genAI.getGenerativeModel({
+    model: "gemini-2.0-pro-exp-02-05",
+    systemInstruction: warSystemInstruction
+});
+
+const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+    responseMimeType: "text/plain",
+};
+
+async function generateNationGemini(nationConcept, governmentType, age, optionalPrompt) {
+    const chatSession = nationModel.startChat({
         generationConfig,
     });
 
     const prompt = `
-        Genera una guerra entre ${nationA} y ${nationB} por el siguiente casus belli: ${casusBelli}
+        Como historiador experto, explica cómo el concepto de (${nationConcept}) podría haber existido en
+        la época ('${age}') con un gobierno ('${governmentType})'.
+        Describe el contexto, el impacto en la política y la sociedad, y menciona personajes clave.
+        Sé realista y usa lenguaje preciso.
     `
-    const result = optionalPrompt? await chatSession.sendMessage(optionalPrompt) : await chatSession.sendMessage(prompt);
+    const result = optionalPrompt ? await chatSession.sendMessage(optionalPrompt) : await chatSession.sendMessage(prompt);
+    const responseText = result.response.text().replace(/```(json)?/g, '').trim();
+    return responseText
+}
+
+async function generateWarGemini(nationA, nationB, age, optionalPrompt) {
+    const chatSession = warModel.startChat({
+        generationConfig,
+    });
+
+    const prompt = `
+        Genera una guerra entre ${nationA} y ${nationB} en la siguiente año / momento: ${age}
+    `
+    const result = optionalPrompt || optionalPrompt != "" ? await chatSession.sendMessage(optionalPrompt) : await chatSession.sendMessage(prompt);
     const responseText = result.response.text().replace(/```(json)?/g, '').trim();
     return responseText
 }

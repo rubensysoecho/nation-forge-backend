@@ -1,4 +1,5 @@
 import Nation from '../models/Nation.js';
+import War from '../models/War.js';
 import { generateNation } from '../config/openai.js';
 import { generateNationGemini, generateWarGemini } from '../config/gemini.js';
 
@@ -37,12 +38,11 @@ const createNationGemini = async (req, res) => {
 const createWarGemini = async (req, res) => {
     try {
         console.log(`⚔️ Generando conflicto (Peace was never an option...) - Gemini ...`)
-        const warString = await generateWarGemini(req.body.nationA, req.body.nationB, req.body.casusBelli, req.body.optionalPrompt);
+        const warString = await generateWarGemini(req.body.nationA, req.body.nationB, req.body.age, req.body.optionalPrompt);
         const warJSON = JSON.parse(warString);
-        // TODO: Modelo de datos de War
         const newWar = new War(warJSON);
-        const savedNation = await newNation.save();
-        res.send({ msg: "Nation created successfully", nation: savedNation });
+        const savedWar = await newWar.save();
+        res.send({ msg: "War created successfully", war: savedWar });
     } catch (error) {
         console.log(error);
         res.send(
@@ -63,8 +63,22 @@ const getNations = async (req, res) => {
     }
 }
 
+const getWars = async (req, res) => {
+    try {
+        const wars = await War.find({});
+        res.send(wars);
+    } catch (error) {
+        console.log(error);
+        res.send(
+            {msg: "Error retrieving wars"}
+        );
+    }
+}
+
 export {
+    getNations,
     createNation,
     createNationGemini,
-    getNations,
+    getWars,
+    createWarGemini,
 }
