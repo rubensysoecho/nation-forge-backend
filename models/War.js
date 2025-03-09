@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const warSchema = new mongoose.Schema({
+    name: { type: String, required: true},
     aggressorCountry: {
         name: { type: String, required: true },
         troops: { type: String, required: true },

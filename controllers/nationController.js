@@ -14,7 +14,7 @@ const createNation = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(
-            {msg: "Error creating nation"}
+            { msg: "Error creating nation" }
         );
     }
 }
@@ -30,7 +30,7 @@ const createNationGemini = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(
-            {msg: "Error creating nation"}
+            { msg: "Error creating nation" }
         );
     }
 }
@@ -38,7 +38,7 @@ const createNationGemini = async (req, res) => {
 const createWarGemini = async (req, res) => {
     try {
         console.log(`⚔️ Generando conflicto (Peace was never an option...) - Gemini ...`)
-        const warString = await generateWarGemini(req.body.nationA, req.body.nationB, req.body.age, req.body.optionalPrompt);
+        const warString = await generateWarGemini(req.body.nationA, req.body.nationB, req.body.casusBelli, req.body.age, req.body.optionalPrompt);
         const warJSON = JSON.parse(warString);
         const newWar = new War(warJSON);
         const savedWar = await newWar.save();
@@ -46,7 +46,7 @@ const createWarGemini = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(
-            {msg: "Error creating nation"}
+            { msg: "Error creating nation" }
         );
     }
 }
@@ -58,7 +58,7 @@ const getNations = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(
-            {msg: "Error retrieving nations"}
+            { msg: "Error retrieving nations" }
         );
     }
 }
@@ -70,7 +70,7 @@ const getWars = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(
-            {msg: "Error retrieving wars"}
+            { msg: "Error retrieving wars" }
         );
     }
 }

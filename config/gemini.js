@@ -141,6 +141,7 @@ const warSystemInstruction = `
 
         El resultado debe estar en el siguiente formato JSON (solo envía el texto en el formato, sin nada mas):
         {
+            "name": "",
             "aggressorCountry": {
                 "name": "",
                 "troops": "",
@@ -164,8 +165,9 @@ const warSystemInstruction = `
         }
 
         Para aclarar, definiré los componentes más abstractos: 
+        - name: debe tener en cuenta pasados conflictos que hubieran podido tener los paises beligerantes siempre y cuando cumplan la misma naturaleza, por ejemplo si se trata de la invasión española de américa con intenciones conquistadoras, se llamará 2a Reconquista, una guerra civil en estados unidos actualmente se llamaría 2a guerra de secesión
         - warProgress: incluirá algo así {"day": "23-25", "events": ["An attack occurred on Madrid", "Protests for peace", etc...]},
-       - importantBattles: representará con todo detalle las tácticas utilizadas en esa batalla y una representación realista de la misma
+        - importantBattles: representará con todo detalle las tácticas utilizadas en esa batalla y una representación realista de la misma
         - soldierView: incluirá un String con una narración que incluirá la visión de un soldado normal en la guerra, en 1a persona
         - kia: una lista con las bajas humanas de un bando y de otro
         - results: consecuencias de la guerra, por ejemplo, anexión de territorio, derechos de recursos etc..
@@ -206,13 +208,13 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
     return responseText
 }
 
-async function generateWarGemini(nationA, nationB, age, optionalPrompt) {
+async function generateWarGemini(nationA, nationB, casusBelli, age, optionalPrompt) {
     const chatSession = warModel.startChat({
         generationConfig,
     });
 
     const prompt = `
-        Genera una guerra entre ${nationA} y ${nationB} en la siguiente año / momento: ${age}
+        Genera una guerra entre ${nationA} y ${nationB} con el casus belli: ${casusBelli}, en la siguiente año / momento: ${age}
     `
     const result = optionalPrompt || optionalPrompt != "" ? await chatSession.sendMessage(optionalPrompt) : await chatSession.sendMessage(prompt);
     const responseText = result.response.text().replace(/```(json)?/g, '').trim();
