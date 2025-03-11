@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const warSchema = new mongoose.Schema({
-    name: { type: String, required: true},
+    name: { type: String, required: true },
     aggressorCountry: {
         name: { type: String, required: true },
         troops: { type: String, required: true },
@@ -22,9 +22,13 @@ const warSchema = new mongoose.Schema({
         events: [{ type: String, required: true }]
     }],
     soldierView: { type: String, required: true },
-    kia: [{ type: String }], // Cambiado a Array de Strings para manejar el formato de tu JSON
+    kia: [{ type: String }],
     results: { type: String, required: true },
-    winner: { type: String, required: true }
+    winner: { type: String, required: true },
+    creator: {
+        type: String,
+        required: true
+    }
 });
 
 const War = mongoose.model('War', warSchema);
