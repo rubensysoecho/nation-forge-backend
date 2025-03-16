@@ -59,6 +59,16 @@ const createWarGemini = async (req, res) => {
 
 const getNations = async (req, res) => {
     try {
+        const nations = await Nation.find(); // Filtra por userId
+        res.send(nations);
+    } catch (error) {
+        console.error(error); // Usa console.error para errores
+        res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+    }
+};
+
+const getNationsUser = async (req, res) => {
+    try {
         const userId = req.query.userId; // Obtiene el userId de los query parameters
 
         if (!userId) {
@@ -72,6 +82,7 @@ const getNations = async (req, res) => {
         res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
     }
 };
+
 
 const getWars = async (req, res) => {
     try {
@@ -91,6 +102,7 @@ const getWars = async (req, res) => {
 
 export {
     getNations,
+    getNationsUser,
     createNation,
     createNationGemini,
     getWars,
