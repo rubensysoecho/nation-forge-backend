@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
+
 const nationSystemInstruction = `Eres un historiador profesional especializado en historia alternativa. Tu tarea es crear relatos extremadamente detallados y completamente inmersivos sobre naciones ficticias dentro de un contexto histórico alternativo. 
         - **Contexto histórico:** Explica cómo surgió la nación, los eventos clave que marcaron su creación y cómo logró mantenerse a lo largo del tiempo o hasta la fecha que dicte el usuario. 
         - **Contexto geopolítico:** Describe las guerras provocadas por la existencia de la nación, las alianzas estratégicas y la expansión territorial que experimentó. Incorpora personajes ficticios importantes, como generales, diplomáticos o estrategas, relacionados con los eventos descritos. 
