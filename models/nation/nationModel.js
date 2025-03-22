@@ -1,5 +1,5 @@
-import mongoose, { Schema} from 'mongoose';
-import { eventSchema } from './events/eventModel.ts'
+import mongoose, { Schema } from 'mongoose';
+import { eventSchema } from './events/eventModel.js';
 
 const nationSchema = new Schema({
     id: {
@@ -53,4 +53,4 @@ const nationSchema = new Schema({
 });
 
 const Nation = mongoose.model("Nation", nationSchema);
-export default Nation;
+export default Nation; 

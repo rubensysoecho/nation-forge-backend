@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const eventSchema = new Schema({
     id: {
@@ -13,6 +13,6 @@ const eventSchema = new Schema({
     date: { type: Date, required: true },
 }, { discriminatorKey: 'type' });
 
-const Event: Model<any> = mongoose.model('Event', eventSchema);
+const Event = mongoose.model('Event', eventSchema);
 
-export { Event, eventSchema };
+export { Event, eventSchema }; 
