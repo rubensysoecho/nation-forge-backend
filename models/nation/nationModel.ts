@@ -1,16 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { Schema} from 'mongoose';
+import { eventSchema } from './events/eventModel.ts'
 
-/* const nationSchema = new mongoose.Schema({
+const nationSchema = new Schema({
     id: {
-        type: mongoose.Schema.Types.UUID,
+        type: Schema.Types.UUID,
         default: () => new mongoose.Types.UUID(),
         unique: true,
         required: true
     },
-    nationName: {
+    name: {
         type: String,
         maxLength: 255,
-        default: null
+        required: true,
     },
     historicalContext: {
         type: String,
@@ -40,33 +41,7 @@ import mongoose from "mongoose";
         type: [String],
         default: []
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    creator: {
-        type: String,
-        required: true
-    }
-}); */
-
-
-const nationSchema = new Schema({
-    id: {
-        type: Schema.Types.UUID,
-        default: () => new mongoose.Types.UUID(),
-        unique: true,
-        required: true
-    },
-    name: {  // Changed from nation_name
-        type: String,
-        maxLength: 255,
-        required: true, // Make name required
-    },
-    events: {
-        type: [eventSchema],
-        default: []
-    },
+    events: [eventSchema],
     created_at: {
         type: Date,
         default: Date.now

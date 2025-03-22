@@ -1,9 +1,8 @@
-import Nation from '../models/Nation.js';
-import War from '../models/War.js';
-import { generateNation } from '../config/openai.js';
-import { generateNationGemini, generateWarGemini } from '../config/gemini.js';
+import Nation from '../models/nation/nationModel.ts';
+import { Event } from '../models/nation/events/eventModel.ts';
+import { generateNationGemini } from '../config/gemini.js';
 
-const createNation = async (req, res) => {
+/* const createNation = async (req, res) => {
     try {
         console.log('🌏 Generando nacion - OpenAI ...')
         const nationString = await generateNation(req.body.nationName, req.body.governmentType, req.body.age);
@@ -17,8 +16,35 @@ const createNation = async (req, res) => {
             { msg: "Error creating nation" }
         );
     }
-}
+} */
 
+// METODOS GET
+const getNations = async (req, res) => {
+    try {
+        const nations = await Nation.find(); // Filtra por userId
+        res.send(nations);
+    } catch (error) {
+        console.error(error); // Usa console.error para errores
+        res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+    }
+};
+const getNationsUser = async (req, res) => {
+    try {
+        const userId = req.params.userId; // Obtiene el userId de los query parameters
+
+        if (!userId) {
+            return res.status(400).send({ msg: "userId is required in query parameters" });
+        }
+
+        const nations = await Nation.find({ creator: userId }); // Filtra por userId
+        res.send(nations);
+    } catch (error) {
+        console.error(error); // Usa console.error para errores
+        res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+    }
+};
+
+// METODOS POST
 const createNationGemini = async (req, res) => {
     try {
         console.log(`🌏 Generando nacion - Gemini ...`)
@@ -37,74 +63,129 @@ const createNationGemini = async (req, res) => {
         );
     }
 }
-
-const createWarGemini = async (req, res) => {
+const addEvent = async (req, res) => {
     try {
-        console.log(`⚔️ Generando conflicto (Peace was never an option...) - Gemini ...`)
-        const warString = await generateWarGemini(req.body.nationA, req.body.nationB, req.body.casusBelli, req.body.age, req.body.optionalPrompt);
-        const warJSON = JSON.parse(warString);
-        const newWar = new War({
-            ...warJSON,
-            creator: req.body.userId
-        });
-        const savedWar = await newWar.save();
-        res.send({ msg: "War created successfully", war: savedWar });
+        const nationId = req.params.nationId; // Cambiado de req.query.nationId
+        const eventData = req.body;
+
+        const nation = await Nation.findById(nationId);
+
+        if (!nation) {
+            return res.status(404).json({ message: 'Nación no encontrada' });
+        }
+
+        const newEvent = new Event(eventData)
+        nation.events.push(newEvent);
+        await nation.save();
+
+        res.status(200).json(nation);
     } catch (error) {
-        console.log(error);
-        res.send(
-            { msg: "Error creating nation" }
-        );
+        console.error('Error al añadir evento a la nación:', error);
+        res.status(500).json({ message: 'Error interno del servidor', error });
     }
 }
 
-const getNations = async (req, res) => {
+// METODOS DELETE
+const deleteNation = async (req, res) => {
     try {
-        const nations = await Nation.find(); // Filtra por userId
-        res.send(nations);
+        const nationId = req.params.id; // Obtener el ID de los parámetros de la URL
+
+        const nation = await Nation.findById(nationId);
+
+        if (!nation) {
+            return res.status(404).json({ 
+                message: 'Nación no encontrada' 
+            });
+        }
+
+        // Verificar si el usuario que intenta eliminar es el creador
+        if (nation.creator !== req.body.userId) {
+            return res.status(403).json({ 
+                message: 'No tienes permisos para eliminar esta nación' 
+            });
+        }
+
+        await Nation.findByIdAndDelete(nationId);
+
+        res.status(200).json({ 
+            message: 'Nación eliminada exitosamente' 
+        });
     } catch (error) {
-        console.error(error); // Usa console.error para errores
-        res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+        console.error('Error al eliminar la nación:', error);
+        res.status(500).json({ 
+            message: 'Error interno del servidor', 
+            error: error.message 
+        });
     }
 };
 
-const getNationsUser = async (req, res) => {
+// METODOS PUT
+const updateNation = async (req, res) => {
     try {
-        const userId = req.query.userId; // Obtiene el userId de los query parameters
+        const nationId = req.params.id;
+        const updates = req.body;
 
-        if (!userId) {
-            return res.status(400).send({ msg: "userId is required in query parameters" });
+        // Buscar la nación
+        const nation = await Nation.findById(nationId);
+
+        if (!nation) {
+            return res.status(404).json({ 
+                message: 'Nación no encontrada' 
+            });
         }
 
-        const nations = await Nation.find({ creator: userId }); // Filtra por userId
-        res.send(nations);
-    } catch (error) {
-        console.error(error); // Usa console.error para errores
-        res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
-    }
-};
-
-
-const getWars = async (req, res) => {
-    try {
-        const userId = req.query.userId; // Obtiene el userId de los query parameters
-
-        if (!userId) {
-            return res.status(400).send({ msg: "userId is required in query parameters" });
+        // Verificar si el usuario que intenta editar es el creador
+        if (nation.creator !== updates.userId) {
+            return res.status(403).json({ 
+                message: 'No tienes permisos para editar esta nación' 
+            });
         }
 
-        const wars = await War.find({ creator: userId }); // Filtra por userId
-        res.send(wars);
+        // Validar campos que se pueden actualizar
+        const allowedUpdates = [
+            'name',
+            'historicalContext',
+            'geopoliticalContext',
+            'politics',
+            'population',
+            'historicalCuriosities',
+            'importantCharacters'
+        ];
+
+        // Filtrar solo los campos permitidos
+        const filteredUpdates = Object.keys(updates)
+            .filter(key => allowedUpdates.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = updates[key];
+                return obj;
+            }, {});
+
+        // Actualizar la nación
+        const updatedNation = await Nation.findByIdAndUpdate(
+            nationId,
+            { $set: filteredUpdates },
+            { new: true, runValidators: true }
+        );
+
+        res.status(200).json({
+            message: 'Nación actualizada exitosamente',
+            nation: updatedNation
+        });
     } catch (error) {
-        console.error(error); // Usa console.error para errores
-        res.status(500).send({ msg: "Error retrieving wars", error: error.message }); // Añade el mensaje de error
+        console.error('Error al actualizar la nación:', error);
+        res.status(500).json({ 
+            message: 'Error interno del servidor', 
+            error: error.message 
+        });
     }
 };
 
 export {
     getNations,
     getNationsUser,
-    createNation,
+    //createNation,
     createNationGemini,
-    getWars,
-    createWarGemini,
+    addEvent,
+    deleteNation,
+    updateNation
 }
