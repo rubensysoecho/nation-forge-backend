@@ -1,5 +1,5 @@
-import Nation from '../models/nation/nationModel.ts';
-import { Event } from '../models/nation/events/eventModel.ts';
+import Nation from '../models/nation/nationModel.js';
+import { Event } from '../models/nation/events/eventModel.js';
 import { generateNationGemini } from '../config/gemini.js';
 
 /* const createNation = async (req, res) => {
@@ -36,11 +36,12 @@ const getNationsUser = async (req, res) => {
             return res.status(400).send({ msg: "userId is required in query parameters" });
         }
 
-        const nations = await Nation.find({ creator: userId }); // Filtra por userId
+        const nations = await Nation.find({ creator: userId });
+        console.log('🌍 Found nations:', nations.length);
         res.send(nations);
     } catch (error) {
-        console.error(error); // Usa console.error para errores
-        res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+        console.error('❌ Error in getNationsUser:', error);
+        res.status(500).send({ msg: "Error retrieving nations", error: error.message });
     }
 };
 
