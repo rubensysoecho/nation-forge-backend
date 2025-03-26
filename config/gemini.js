@@ -94,8 +94,8 @@ Generar una narrativa histórica coherente, realista y cautivadora que describa 
 - Si tienen mote o apodo, explícalo
 
 ## Formato de Salida
-
 El resultado debe estar en el siguiente formato JSON (solo envía el texto en el formato, sin nada más):
+RECUERDA: NO UTILIZAR MARKDOWN EN EL TEXTO
 
 {
     "name": "Nombre de la nación",
