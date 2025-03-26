@@ -37,7 +37,6 @@ const getNationsUser = async (req, res) => {
         }
 
         const nations = await Nation.find({ creator: userId });
-        console.log('🌍 Found nations:', nations.length);
         res.send(nations);
     } catch (error) {
         console.error('❌ Error in getNationsUser:', error);

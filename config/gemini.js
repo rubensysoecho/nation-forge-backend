@@ -38,7 +38,15 @@ Generar una narrativa histórica coherente, realista y cautivadora que describa 
   * Una rebelión exitosa
   * Un tratado de alianza
   * Un evento natural significativo
-- El evento debe ser original y no basarse en eventos históricos reales
+  * etc
+- Los eventos pueden ser de los siguientes tipos:
+  * fundación => foundation
+  * guerra => war
+  * tratado => treaty
+  * revolución => revolution
+  * desastre natural => natural disaster
+  * plagas => plagues
+  * etc
 
 ### Detalles de la Narrativa
 
@@ -86,8 +94,8 @@ Generar una narrativa histórica coherente, realista y cautivadora que describa 
 - Si tienen mote o apodo, explícalo
 
 ## Formato de Salida
-
 El resultado debe estar en el siguiente formato JSON (solo envía el texto en el formato, sin nada más):
+RECUERDA: NO UTILIZAR MARKDOWN EN EL TEXTO
 
 {
     "name": "Nombre de la nación",
@@ -99,11 +107,18 @@ El resultado debe estar en el siguiente formato JSON (solo envía el texto en el
     "importantCharacters": ["", ""],
     "events": [
         {
-            "type": "fundacion",
+            "type": "foundation",
             "date": "Fecha de fundación (ISO 8601)",
             "title": "Fundación de la Nación",
             "description": "Descripción del contexto histórico de la fundación"
-        }
+        },
+        {
+            "type": "evento",
+            "date": "Fecha del evento (ISO 8601)",
+            "title": "Título del evento",
+            "description": "Descripción del evento"
+        },
+        {etc...
     ]
 }
 `
@@ -274,7 +289,7 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
         Me vas a generar lo siguiente:
         Nacion: ${nationConcept}
         Tipo de gobierno: ${governmentType}
-        Época: ${age}
+        Época (Representa el año en el que se debe representar la nación, no su año de fundación): ${age}
     `
 
     const result = optionalPrompt ? await chatSession.sendMessage(optionalPrompt) : await chatSession.sendMessage(prompt);
