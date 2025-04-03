@@ -52,8 +52,9 @@ const createNationGemini = async (req, res) => {
         const nationJSON = JSON.parse(nationString);
         const newNation = new Nation({
             ...nationJSON,
-            creator: req.body.userId
+            creator: req.body.userId,
         });
+        console.log('NUEVA NACION:', newNation);
         const savedNation = await newNation.save();
         res.send({ msg: "Nation created successfully", nation: savedNation });
     } catch (error) {
@@ -149,7 +150,10 @@ const updateNation = async (req, res) => {
             'politics',
             'population',
             'historicalCuriosities',
-            'importantCharacters'
+            'importantCharacters',
+            'politicsDetails',
+            'economyDetails',
+            'populationDetails'
         ];
 
         // Filtrar solo los campos permitidos

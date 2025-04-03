@@ -1,5 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import { eventSchema } from './events/eventModel.js';
+import { politicalDetailsSchema } from './details/politicalDetails.js';
+import { economyDetailsSchema } from './details/economyDetails.js';
+import { populationDetailsSchema } from './details/populationDetails.js';
 
 const nationSchema = new Schema({
     id: {
@@ -42,6 +45,18 @@ const nationSchema = new Schema({
         default: []
     },
     events: [eventSchema],
+    politicsDetails: {
+        type: politicalDetailsSchema,
+        required: true
+    },
+    economyDetails: {
+        type: economyDetailsSchema,
+        required: true
+    },
+    populationDetails: {
+        type: populationDetailsSchema,
+        required: true
+    },
     created_at: {
         type: Date,
         default: Date.now
@@ -53,4 +68,4 @@ const nationSchema = new Schema({
 });
 
 const Nation = mongoose.model("Nation", nationSchema);
-export default Nation; 
+export default Nation;
