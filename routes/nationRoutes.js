@@ -20,6 +20,7 @@ router.post('/:nationId/events', addEvent);
 
 // EDITAR
 router.put('/:id', updateNation);
+
 router.delete('/:id', deleteNation);
 
 // router.post('/', createNation);

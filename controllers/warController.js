@@ -1,4 +1,3 @@
-import War from '../models/War.js';
 import { generateWarGemini } from '../config/gemini.js';
 
 const createWarGemini = async (req, res) => {

@@ -47,15 +47,16 @@ const getNationsUser = async (req, res) => {
 // METODOS POST
 const createNationGemini = async (req, res) => {
     try {
-        console.log(`🌏 Generando nacion - Gemini ...`)
+        console.log(`🌏 Generando nacion...`)
         const nationString = await generateNationGemini(req.body.nationName, req.body.governmentType, req.body.age);
         const nationJSON = JSON.parse(nationString);
         const newNation = new Nation({
             ...nationJSON,
-            creator: req.body.userId
+            creator: req.body.userId,
         });
         const savedNation = await newNation.save();
-        res.send({ msg: "Nation created successfully", nation: savedNation });
+        console.log(`🌏 Nacion generada: ${savedNation.name}`);
+        res.send({ msg: "Nation created successfully", nation: savedNation.name });
     } catch (error) {
         console.log(error);
         res.send(
@@ -89,32 +90,32 @@ const addEvent = async (req, res) => {
 const deleteNation = async (req, res) => {
     try {
         const nationId = req.params.id; // Obtener el ID de los parámetros de la URL
-
+        console.log(`🌏 Eliminando nación con ID: ${nationId}`);
         const nation = await Nation.findById(nationId);
 
         if (!nation) {
-            return res.status(404).json({ 
-                message: 'Nación no encontrada' 
+            return res.status(404).json({
+                message: 'Nación no encontrada'
             });
         }
 
         // Verificar si el usuario que intenta eliminar es el creador
         if (nation.creator !== req.body.userId) {
-            return res.status(403).json({ 
-                message: 'No tienes permisos para eliminar esta nación' 
+            return res.status(403).json({
+                message: 'No tienes permisos para eliminar esta nación'
             });
         }
 
         await Nation.findByIdAndDelete(nationId);
-
-        res.status(200).json({ 
-            message: 'Nación eliminada exitosamente' 
+        console.log(`🌏 Nación eliminada: ${nation.name}`);
+        res.status(200).json({
+            message: 'Nación eliminada exitosamente'
         });
     } catch (error) {
         console.error('Error al eliminar la nación:', error);
-        res.status(500).json({ 
-            message: 'Error interno del servidor', 
-            error: error.message 
+        res.status(500).json({
+            message: 'Error interno del servidor',
+            error: error.message
         });
     }
 };
@@ -129,15 +130,15 @@ const updateNation = async (req, res) => {
         const nation = await Nation.findById(nationId);
 
         if (!nation) {
-            return res.status(404).json({ 
-                message: 'Nación no encontrada' 
+            return res.status(404).json({
+                message: 'Nación no encontrada'
             });
         }
 
         // Verificar si el usuario que intenta editar es el creador
         if (nation.creator !== updates.userId) {
-            return res.status(403).json({ 
-                message: 'No tienes permisos para editar esta nación' 
+            return res.status(403).json({
+                message: 'No tienes permisos para editar esta nación'
             });
         }
 
@@ -149,7 +150,10 @@ const updateNation = async (req, res) => {
             'politics',
             'population',
             'historicalCuriosities',
-            'importantCharacters'
+            'importantCharacters',
+            'politicsDetails',
+            'economyDetails',
+            'populationDetails'
         ];
 
         // Filtrar solo los campos permitidos
@@ -173,9 +177,9 @@ const updateNation = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al actualizar la nación:', error);
-        res.status(500).json({ 
-            message: 'Error interno del servidor', 
-            error: error.message 
+        res.status(500).json({
+            message: 'Error interno del servidor',
+            error: error.message
         });
     }
 };
