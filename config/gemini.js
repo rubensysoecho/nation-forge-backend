@@ -13,6 +13,20 @@ import {
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
+// Función para limpiar y validar respuestas JSON de Gemini
+function cleanJsonResponse(text) {
+  // Eliminar bloques de código markdown
+  let cleaned = text.replace(/```(json)?|```/g, '');
+  // Eliminar espacios en blanco al principio y al final
+  cleaned = cleaned.trim();
+  // Reemplazar comillas incorrectas si existen
+  cleaned = cleaned.replace(/[""]/g, '"');
+  // Asegurar que no haya comas después del último elemento en arreglos u objetos
+  cleaned = cleaned.replace(/,(\s*[\]}])/g, '$1');
+  
+  return cleaned;
+}
+
 const nationModel = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
     systemInstruction: nationSystemInstruction
@@ -34,23 +48,23 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
         .replace('{{age}}', age);
 
     const result1 = await chatSession.sendMessage(prompt);
-    const responseText1 = result1.response.text().replace(/```(json)?/g, '').trim();
-    const json1 = JSON.parse(responseText1)
+    const responseText1 = cleanJsonResponse(result1.response.text());
+    const json1 = JSON.parse(responseText1);
 
     // Politica
-    const result2 = await chatSession.sendMessage(politicsDetailsPrompt)
-    const responseText2 = result2.response.text().replace(/```(json)?/g, '').trim();
-    const json2 = JSON.parse(responseText2)
+    const result2 = await chatSession.sendMessage(politicsDetailsPrompt);
+    const responseText2 = cleanJsonResponse(result2.response.text());
+    const json2 = JSON.parse(responseText2);
 
     // Economía
-    const result3 = await chatSession.sendMessage(economicDetailsPrompt)
-    const responseText3 = result3.response.text().replace(/```(json)?/g, '').trim();
-    const json3 = JSON.parse(responseText3)
+    const result3 = await chatSession.sendMessage(economicDetailsPrompt);
+    const responseText3 = cleanJsonResponse(result3.response.text());
+    const json3 = JSON.parse(responseText3);
 
     // Demografia
-    const result4 = await chatSession.sendMessage(populationDetailsPrompt)
-    const responseText4 = result4.response.text().replace(/```(json)?/g, '').trim();
-    const json4 = JSON.parse(responseText4)
+    const result4 = await chatSession.sendMessage(populationDetailsPrompt);
+    const responseText4 = cleanJsonResponse(result4.response.text());
+    const json4 = JSON.parse(responseText4);
 
     json1.politicsDetails = json2
     json1.economyDetails = json3
@@ -72,7 +86,7 @@ async function generateWarGemini(nationA, nationB, casusBelli, age, optionalProm
         .replace('{{age}}', age);
 
     const result = await chatSession.sendMessage(prompt);
-    const responseText = result.response.text().replace(/```(json)?/g, '').trim();
+    const responseText = cleanJsonResponse(result.response.text());
     return responseText
 }
 
