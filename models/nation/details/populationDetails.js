@@ -9,7 +9,7 @@ const urbanRuralSplitSchema = new mongoose.Schema({
 
 const ageBracketSchema = new mongoose.Schema({
   bracket: { type: String, required: true },
-  percentage: { type: String, required: true },
+  percentage: { type: String},
 });
 
 const ageDistributionSchema = new mongoose.Schema({
@@ -20,7 +20,7 @@ const ageDistributionSchema = new mongoose.Schema({
 
 const ethnicGroupSchema = new mongoose.Schema({
   groupName: { type: String, required: true },
-  percentage: { type: String, required: true },
+  percentage: { type: String},
   notes: { type: String },
 });
 
@@ -55,7 +55,7 @@ const migrationSchema = new mongoose.Schema({
 
 const workforceDistributionSchema = new mongoose.Schema({
   sector: { type: String, required: true },
-  percentage: { type: String, required: true },
+  percentage: { type: String },
   dominantProfessions: [{ type: String }],
 });
 
