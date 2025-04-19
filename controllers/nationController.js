@@ -56,7 +56,7 @@ const createNationGemini = async (req, res) => {
         });
         const savedNation = await newNation.save();
         console.log(`🌏 Nacion generada: ${savedNation.name}`);
-        res.send({ msg: "Nation created successfully", nation: savedNation.name });
+        res.send({ msg: "Nation created successfully", nation: savedNation });
     } catch (error) {
         console.log(error);
         res.send(
