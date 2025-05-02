@@ -1,22 +1,6 @@
 import Nation from '../models/nation/nationModel.js';
 import { Event } from '../models/nation/events/eventModel.js';
-import { generateNationGemini } from '../config/gemini.js';
-
-/* const createNation = async (req, res) => {
-    try {
-        console.log('🌏 Generando nacion - OpenAI ...')
-        const nationString = await generateNation(req.body.nationName, req.body.governmentType, req.body.age);
-        const nationJSON = JSON.parse(nationString);
-        const newNation = new Nation(nationJSON);
-        const savedNation = await newNation.save();
-        res.send({ msg: "Nation created successfully", nation: savedNation });
-    } catch (error) {
-        console.log(error);
-        res.send(
-            { msg: "Error creating nation" }
-        );
-    }
-} */
+import { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini } from '../config/gemini.js';
 
 // METODOS GET
 const getNations = async (req, res) => {
@@ -48,7 +32,25 @@ const getNationsUser = async (req, res) => {
 const createNationGemini = async (req, res) => {
     try {
         console.log(`🌏 Generando nacion...`)
-        const nationString = await generateNationGemini(req.body.nationName, req.body.governmentType, req.body.age);
+        var nationString = "";
+        if (req.body.advanced == true) {
+            nationString = await generateNationAdvancedGemini(
+                req.body.nationName,
+                req.body.governmentType,
+                req.body.age,
+                req.body.leaderName,
+                req.body.politicalStability,
+                req.body.economicSystem,
+                req.body.currencyName,
+                req.body.wealthDistribution,
+                req.body.lifeExpectancy,
+                req.body.populationGrowth,
+                req.body.other,
+            );
+        } else {
+            nationString = await generateNationGemini(req.body.nationName, req.body.governmentType, req.body.age);
+        }
+        console.log(nationString)
         const nationJSON = JSON.parse(nationString);
         const newNation = new Nation({
             ...nationJSON,
@@ -64,6 +66,28 @@ const createNationGemini = async (req, res) => {
         );
     }
 }
+
+const createRandomNation = async (req, res) => {
+    try {
+        console.log(`🌏 Generando nacion...`)
+        const nationString = await generateNationRandomGemini();
+        console.log(nationString)
+        const nationJSON = JSON.parse(nationString);
+        const newNation = new Nation({
+            ...nationJSON,
+            creator: req.body.userId,
+        });
+        const savedNation = await newNation.save();
+        console.log(`🌏 Nacion generada: ${savedNation.name}`);
+        res.send({ msg: "Nation created successfully", nation: savedNation });
+    } catch (error) {
+        console.log(error);
+        res.send(
+            { msg: "Error creating nation" }
+        );
+    }
+}
+
 const addEvent = async (req, res) => {
     try {
         const nationId = req.params.nationId; // Cambiado de req.query.nationId
@@ -189,6 +213,7 @@ export {
     getNationsUser,
     //createNation,
     createNationGemini,
+    createRandomNation,
     addEvent,
     deleteNation,
     updateNation

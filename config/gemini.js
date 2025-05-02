@@ -1,12 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
   nationSystemInstruction,
+  nationSystemInstructionAdvanced,
   warSystemInstruction,
   politicsDetailsPrompt,
   economicDetailsPrompt,
   populationDetailsPrompt,
   generationConfig,
   nationPromptTemplate,
+  nationAdvancedPromptTemplate,
+  nationRandomPromptTemplate,
   warPromptTemplate
 } from "../helpers/geminiInstructions.js";
 
@@ -47,6 +50,88 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
         .replace('{{governmentType}}', governmentType)
         .replace('{{age}}', age);
 
+    // Detalles básicos
+    const result1 = await chatSession.sendMessage(prompt);
+    const responseText1 = cleanJsonResponse(result1.response.text());
+    const json1 = JSON.parse(responseText1);
+
+    // Politica
+    const result2 = await chatSession.sendMessage(politicsDetailsPrompt);
+    const responseText2 = cleanJsonResponse(result2.response.text());
+    const json2 = JSON.parse(responseText2);
+
+    // Economía
+    const result3 = await chatSession.sendMessage(economicDetailsPrompt);
+    const responseText3 = cleanJsonResponse(result3.response.text());
+    const json3 = JSON.parse(responseText3);
+
+    // Demografia
+    const result4 = await chatSession.sendMessage(populationDetailsPrompt);
+    const responseText4 = cleanJsonResponse(result4.response.text());
+    const json4 = JSON.parse(responseText4);
+
+    json1.politicsDetails = json2
+    json1.economyDetails = json3
+    json1.populationDetails = json4
+
+    let updatedJsonStr = JSON.stringify(json1, null, 2)
+    return updatedJsonStr
+}
+
+async function generateNationAdvancedGemini(nationConcept, governmentType, age, leaderName, politicalStability, economicSystem, currencyName, wealthDistribution, lifeExpectancy, populationGrowth, other) {
+    const chatSession = nationModel.startChat({
+        generationConfig,
+    });
+
+    const prompt = nationAdvancedPromptTemplate
+        .replace('{{nationConcept}}', nationConcept)
+        .replace('{{governmentType}}', governmentType)
+        .replace('{{age}}', age)
+        .replace('{{leaderName}}', leaderName)
+        .replace('{{politicalStability}}', politicalStability)
+        .replace('{{economicSystem}}', economicSystem)
+        .replace('{{currencyName}}', currencyName)
+        .replace('{{wealthDistribution}}', wealthDistribution)
+        .replace('{{lifeExpectancy}}', lifeExpectancy)
+        .replace('{{populationGrowth}}', populationGrowth)
+        .replace('{{other}}', other);
+
+    // Detalles básicos
+    const result1 = await chatSession.sendMessage(prompt);
+    const responseText1 = cleanJsonResponse(result1.response.text());
+    const json1 = JSON.parse(responseText1);
+
+    // Politica
+    const result2 = await chatSession.sendMessage(politicsDetailsPrompt);
+    const responseText2 = cleanJsonResponse(result2.response.text());
+    const json2 = JSON.parse(responseText2);
+
+    // Economía
+    const result3 = await chatSession.sendMessage(economicDetailsPrompt);
+    const responseText3 = cleanJsonResponse(result3.response.text());
+    const json3 = JSON.parse(responseText3);
+
+    // Demografia
+    const result4 = await chatSession.sendMessage(populationDetailsPrompt);
+    const responseText4 = cleanJsonResponse(result4.response.text());
+    const json4 = JSON.parse(responseText4);
+
+    json1.politicsDetails = json2
+    json1.economyDetails = json3
+    json1.populationDetails = json4
+
+    let updatedJsonStr = JSON.stringify(json1, null, 2)
+    return updatedJsonStr
+}
+
+async function generateNationRandomGemini() {
+    const chatSession = nationModel.startChat({
+        generationConfig,
+    });
+
+    const prompt = nationRandomPromptTemplate
+
+    // Detalles básicos
     const result1 = await chatSession.sendMessage(prompt);
     const responseText1 = cleanJsonResponse(result1.response.text());
     const json1 = JSON.parse(responseText1);
@@ -90,4 +175,4 @@ async function generateWarGemini(nationA, nationB, casusBelli, age, optionalProm
     return responseText
 }
 
-export { generateNationGemini, generateWarGemini }
+export { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini, generateWarGemini }

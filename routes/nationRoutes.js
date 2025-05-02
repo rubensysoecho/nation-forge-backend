@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
     createNationGemini, 
+    createRandomNation,
     getNations, 
     getNationsUser, 
     addEvent,
@@ -16,6 +17,7 @@ router.get('/:userId', getNationsUser);
 
 // CREAR
 router.post('/', createNationGemini);
+router.post('/random', createRandomNation);
 router.post('/:nationId/events', addEvent);
 
 // EDITAR
