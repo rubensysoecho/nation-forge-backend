@@ -12,6 +12,7 @@ const getNations = async (req, res) => {
         res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
     }
 };
+
 const getNationsUser = async (req, res) => {
     try {
         const userId = req.params.userId; // Obtiene el userId de los query parameters
@@ -27,6 +28,43 @@ const getNationsUser = async (req, res) => {
         res.status(500).send({ msg: "Error retrieving nations", error: error.message });
     }
 };
+
+const getNationsUserSimple = async (req, res) => {
+    try {
+        const userId = req.params.userId; // Obtiene el userId de los query parameters
+
+        if (!userId) {
+            return res.status(400).send({ msg: "userId is required in query parameters" });
+        }
+
+        const nations = await Nation.find({ creator: userId }).select('name _id');
+        res.send(nations);
+    } catch (error) {
+        console.error('❌ Error in getNationsUser:', error);
+        res.status(500).send({ msg: "Error retrieving nations", error: error.message });
+    }
+}
+
+const getNationDetails = async (req, res) => {
+    try {
+        const nationId = req.params.nationId; // Cambiado de req.query.nationId
+
+        if (!nationId) {
+            return res.status(400).send({ msg: "nationId is required in query parameters" });
+        }
+
+        const nation = await Nation.findById(nationId);
+
+        if (!nation) {
+            return res.status(404).send({ msg: "Nation not found" });
+        }
+
+        res.send(nation);
+    } catch (error) {
+        console.error('❌ Error in getNationDetails:', error);
+        res.status(500).send({ msg: "Error retrieving nation details", error: error.message });
+    }
+}
 
 // METODOS POST
 const createNationGemini = async (req, res) => {
@@ -211,6 +249,8 @@ const updateNation = async (req, res) => {
 export {
     getNations,
     getNationsUser,
+    getNationsUserSimple,
+    getNationDetails,
     //createNation,
     createNationGemini,
     createRandomNation,

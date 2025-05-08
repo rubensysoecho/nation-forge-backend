@@ -4,6 +4,8 @@ import {
     createRandomNation,
     getNations, 
     getNationsUser, 
+    getNationsUserSimple,
+    getNationDetails,
     addEvent,
     deleteNation,
     updateNation 
@@ -13,7 +15,9 @@ const router = express.Router();
 
 // LEER
 router.get('/', getNations);
+router.get('/simple/:userId', getNationsUserSimple);
 router.get('/:userId', getNationsUser);
+router.get('/details/:nationId', getNationDetails);
 
 // CREAR
 router.post('/', createNationGemini);
