@@ -325,7 +325,6 @@ export const populationSchema = {
   type: Type.OBJECT,
   properties: {
     totalPopulation: { type: Type.STRING },
-    growthRate: { type: Type.STRING },
     populationGrowthRate: { type: Type.STRING },
     lifeExpectancy: {
       type: Type.OBJECT,
@@ -372,7 +371,7 @@ export const populationSchema = {
         required: [] // Se deja vacío para permitir ambos formatos
       }
     },
-    urbanRuralDivide: {
+    urbanRuralSplit: {
       type: Type.OBJECT,
       properties: {
         urbanPercentage: { type: Type.STRING },
@@ -412,7 +411,7 @@ export const populationSchema = {
         infantMortalityRate: { type: Type.STRING },
         accessToHealthcare: { type: Type.STRING }
       },
-      required: ["qualityLevel", "accessLevel", "majorChallenges"]
+      required: ["infantMortalityRate", "accessToHealthcare"]
     },
     migration: {
       type: Type.OBJECT,
@@ -439,21 +438,11 @@ export const populationSchema = {
       }
     },
     socialClasses: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          name: { type: Type.STRING },
-          percentage: { type: Type.STRING },
-          economicStatus: { type: Type.STRING },
-          politicalInfluence: { type: Type.STRING }
-        },
-        required: ["name", "percentage", "economicStatus", "politicalInfluence"]
-      }
+      type: Type.STRING,
     }
   },
   required: [
     "totalPopulation", "ethnicGroups", "languages", "religions",
-    "urbanRuralDivide", "education", "healthCare", "socialClasses"
+    "urbanRuralSplit", "educationLevel", "health", "socialClasses"
   ]
 };

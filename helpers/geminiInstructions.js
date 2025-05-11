@@ -531,76 +531,129 @@ Tarea: Profundiza en la demografía de esa nación. Asegúrate de que los detall
 
 Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON que se muestra a continuación, rellenando todos sus campos con la información demográfica generada. No incluyas ningún texto introductorio o explicativo fuera del JSON. El esquema a seguir es:
 
-- **Población Total**: Número estimado de habitantes
-- **Tasa de Crecimiento**: Tasa de crecimiento poblacional
-- **Esperanza de Vida**:
-  - Hombres: Esperanza de vida para hombres
-  - Mujeres: Esperanza de vida para mujeres
-  - General: Esperanza de vida general
-
-- **Grupos Étnicos**:
-  - [Nombre del Grupo Étnico/Cultural Principal]: [Porcentaje Estimado de la Población]
-    - Notas: [Breve descripción sobre su origen, distribución o estatus]
-  - [Nombre de Minoría Étnica/Cultural Significativa]: [Porcentaje Estimado]
-    - Notas: [Breves notas sobre características distintivas]
-  - Añadir más grupos étnicos/culturales relevantes según sea necesario
-
-- **Idiomas**:
-  - [Nombre del Idioma Oficial/Principal]: [Estatus (Oficial, Mayoritario, Lingua Franca)]
-    - Hablantes: [Porcentaje Estimado (nativos + segunda lengua)]
-  - [Nombre de Idioma Minoritario Relevante]: [Estatus (Regional, Minoritario, En Peligro)]
-    - Hablantes: [Porcentaje Estimado]
-  - Añadir más idiomas relevantes según sea necesario
-
-- **Religiones**:
-  - [Nombre de la Religión/Creencia Principal]: [Porcentaje Estimado de Adherentes]
-    - Influencia: [Nivel en la Sociedad/Política (alto, medio, bajo)]
-  - [Nombre de Religión/Creencia Minoritaria]: [Porcentaje Estimado]
-    - Influencia: [Nivel de Influencia]
-  - Añadir más religiones/creencias según sea necesario
-
-- **División Urbano-Rural**:
-  - Población Urbana: [Porcentaje]
-  - Población Rural: [Porcentaje]
-  - Ciudades Principales:
-    - [Nombre de Ciudad]: [Población aproximada] - [Importancia económica/cultural]
-    - Añadir más ciudades según relevancia
-
-- **Educación**:
-  - Tasa de Alfabetización: [Porcentaje]
-  - Sistema Educativo: [Breve descripción]
-  - Instituciones Destacadas: [Lista de centros educativos importantes]
-  - Nivel Educativo Promedio: [Ej. 'Primaria completa', 'Secundaria incompleta']
-
-- **Sanidad**:
-  - Calidad: [Nivel general de atención médica]
-  - Accesibilidad: [Universal, limitado, privado, desigual]
-  - Desafíos Principales: [Lista de problemas sanitarios significativos]
-  - Mortalidad Infantil: [Tasa por 1000 nacidos vivos]
-
-- **Clases Sociales**:
-  - [Nombre de Clase]: [Porcentaje aproximado]
-    - Estatus Económico: [Descripción]
-    - Influencia Política: [Nivel de influencia]
-  - Añadir más clases sociales según estructura social
-
-- **Distribución por Edad**:
-  - Edad Mediana: [Valor]
-  - Grupos de Edad:
-    - 0-14 años: [Porcentaje Estimado]
-    - 15-64 años: [Porcentaje Estimado]
-    - 65+ años: [Porcentaje Estimado]
-  - Ratio de Dependencia: [Jóvenes + mayores / población activa]
-
-- **Migración**:
-  - Inmigración: [Tasa Estimada (alta, media, baja, negativa)]
-  - Emigración: [Tasa Estimada]
-  - Principales Orígenes/Destinos: [Países relevantes]
-
-- **Distribución Laboral**:
-  - [Sector Económico (Primario/Secundario/Terciario/Cuaternario)]: [Porcentaje]
-    - Profesiones Principales: [Lista de ocupaciones típicas]
-  - Añadir más sectores económicos según relevancia
+{
+    "totalPopulation": "Número estimado de habitantes",
+    "growthRate": "Tasa de crecimiento poblacional",
+    "lifeExpectancy": {
+        "male": "Esperanza de vida para hombres",
+        "female": "Esperanza de vida para mujeres",
+        "overall": "Esperanza de vida general"
+    },
+    "ethnicGroups": [
+        {
+            "name": "Nombre del grupo étnico",
+            "percentage": "Porcentaje que representa",
+            "details": "Información adicional relevante"
+        },
+        {
+            "groupName": "[Nombre del Grupo Étnico/Cultural Principal]",
+            "percentage": "[Porcentaje Estimado de la Población]",
+            "notes": "[Notas breves sobre su origen, distribución o estatus (ej. 'Grupo fundador', 'Concentrado en el norte', 'Dominante políticamente') - coherente con cultura/historia/política]"
+        },
+        {
+            "groupName": "[Nombre de Minoría Étnica/Cultural Significativa]",
+            "percentage": "[Porcentaje Estimado de la Población]",
+            "notes": "[Notas breves]"
+        }
+        // Añade más objetos para otros grupos étnicos/culturales relevantes
+    ],
+    "languages": [
+        {
+            "name": "Nombre del idioma",
+            "usage": "Porcentaje o descripción de uso",
+            "status": "Oficial, regional, minoritario, etc."
+        },
+        {
+            "languageName": "[Nombre del Idioma Oficial/Principal]",
+            "status": "[Estatus (Oficial, Mayoritario, Lingua Franca)]",
+            "percentageSpeakers": "[Porcentaje Estimado de Hablantes (nativos + L2)]"
+        },
+        {
+            "languageName": "[Nombre de Idioma Minoritario Relevante]",
+            "status": "[Estatus (Regional, Minoritario, En Peligro)]",
+            "percentageSpeakers": "[Porcentaje Estimado de Hablantes]"
+        }
+        // Añade más objetos para otros idiomas relevantes
+    ],
+    "religions": [
+        {
+            "name": "Nombre de la religión",
+            "percentage": "Porcentaje de seguidores",
+            "influence": "Nivel de influencia social/política"
+        },
+        {
+            "religionName": "[Nombre de la Religión/Creencia Principal]",
+            "percentageAdherents": "[Porcentaje Estimado de Adherentes]",
+            "influence": "[Nivel de Influencia en la Sociedad/Política (alto, medio, bajo) - coherente con política/cultura]"
+        },
+        {
+            "religionName": "[Nombre de Religión/Creencia Minoritaria Relevante]",
+            "percentageAdherents": "[Porcentaje Estimado de Adherentes]",
+            "influence": "[Nivel de Influencia]"
+        }
+        // Añade más objetos para otras religiones/creencias relevantes
+    ],
+    "urbanRuralDivide": {
+        "urbanPercentage": "Porcentaje de población urbana",
+        "ruralPercentage": "Porcentaje de población rural",
+        "majorCities": [
+            {
+                "name": "Nombre de la ciudad",
+                "population": "Población aproximada",
+                "significance": "Importancia económica, cultural, etc."
+            }
+        ]
+    },
+    "education": {
+        "literacyRate": "Tasa de alfabetización",
+        "educationSystem": "Descripción del sistema educativo",
+        "educationalInstitutions": ["Instituciones educativas destacadas"],
+        "educationLevel": "[Nivel Educativo Promedio (ej. 'Primaria completa', 'Secundaria incompleta', 'Alto nivel en centros urbanos')]"
+    },
+    "healthCare": {
+        "qualityLevel": "Nivel de calidad de la atención médica",
+        "accessLevel": "Accesibilidad a servicios médicos",
+        "majorChallenges": ["Principales desafíos sanitarios"],
+        "infantMortalityRate": "[Tasa de Mortalidad Infantil Estimada (por 1000 nacidos vivos)]",
+        "accessToHealthcare": "[Nivel de Acceso a la Sanidad (universal, limitado, privado, bueno en ciudades/malo en zonas rurales)]"
+    },
+    "socialClasses": [
+        {
+            "name": "Nombre de la clase social",
+            "percentage": "Porcentaje aproximado",
+            "economicStatus": "Estado económico",
+            "politicalInfluence": "Nivel de influencia política"
+        }
+    ],
+    "ageDistribution": {
+        "medianAge": "[Edad Mediana de la Población]",
+        "ageBrackets": [
+            {"bracket": "0-14 años", "percentage": "[Porcentaje Estimado]"},
+            {"bracket": "15-64 años", "percentage": "[Porcentaje Estimado]"},
+            {"bracket": "65+ años", "percentage": "[Porcentaje Estimado]"}
+        ],
+        "dependencyRatio": "[Ratio de Dependencia Estimado (jóvenes + mayores / población activa)]"
+    },
+    "migration": {
+        "immigrationRate": "[Tasa de Inmigración Estimada (alta, media, baja, negativa)]",
+        "emigrationRate": "[Tasa de Emigración Estimada (alta, media, baja, negativa)]",
+        "mainOriginsDestinations": "[Principales Países de Origen (inmigrantes) y Destino (emigrantes) - coherente con política exterior/economía]"
+    },
+    "workforceDistribution": [
+        {
+            "sector": "[Sector Económico (Primario - Agricultura/Minería, Secundario - Manufactura/Construcción, Terciario - Servicios/Comercio, Cuaternario - Información/Tecnología)]",
+            "percentage": "[Porcentaje Estimado de la Fuerza Laboral]",
+            "dominantProfessions": [
+                "[Profesión Típica 1]",
+                "[Profesión Típica 2]"
+                // Añade más profesiones dominantes en este sector
+            ]
+        }
+        // Añade más objetos para otros sectores económicos relevantes
+        // Asegúrate de que la suma de porcentajes sea cercana al 100% de la fuerza laboral activa
+    ],
+    "populationGrowthRate": "[Tasa de Crecimiento Poblacional Anual Estimada (positiva, negativa, estable, porcentaje)]"
+}
 `;
 
 export const generationConfig = {

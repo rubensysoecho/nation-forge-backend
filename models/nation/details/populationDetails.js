@@ -1,16 +1,9 @@
 import mongoose from "mongoose";
 
-// Subesquemas
-const majorCitySchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  population: { type: String, required: true },
-  significance: { type: String, required: true }
-});
-
-const urbanRuralDivideSchema = new mongoose.Schema({
+const urbanRuralSplitSchema = new mongoose.Schema({
   urbanPercentage: { type: String, required: true },
   ruralPercentage: { type: String, required: true },
-  majorCities: [majorCitySchema],
+  majorCities: [{ type: String }],
 });
 
 const ageBracketSchema = new mongoose.Schema({
@@ -25,25 +18,19 @@ const ageDistributionSchema = new mongoose.Schema({
 });
 
 const ethnicGroupSchema = new mongoose.Schema({
-  name: { type: String },
   groupName: { type: String },
   percentage: { type: String, required: true },
-  details: { type: String },
   notes: { type: String }
 });
 
 const languageSchema = new mongoose.Schema({
-  name: { type: String },
   languageName: { type: String },
-  usage: { type: String },
   percentageSpeakers: { type: String },
   status: { type: String, required: true }
 });
 
 const religionSchema = new mongoose.Schema({
-  name: { type: String },
   religionName: { type: String },
-  percentage: { type: String },
   percentageAdherents: { type: String },
   influence: { type: String, required: true }
 });
@@ -54,26 +41,9 @@ const lifeExpectancySchema = new mongoose.Schema({
   overall: { type: String, required: true },
 });
 
-const educationSchema = new mongoose.Schema({
-  literacyRate: { type: String, required: true },
-  educationSystem: { type: String, required: true },
-  educationalInstitutions: [{ type: String }],
-  educationLevel: { type: String, required: true }
-});
-
 const healthCareSchema = new mongoose.Schema({
-  qualityLevel: { type: String, required: true },
-  accessLevel: { type: String, required: true },
-  majorChallenges: [{ type: String }],
   infantMortalityRate: { type: String, required: true },
   accessToHealthcare: { type: String, required: true }
-});
-
-const socialClassSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  percentage: { type: String, required: true },
-  economicStatus: { type: String, required: true },
-  politicalInfluence: { type: String, required: true }
 });
 
 const migrationSchema = new mongoose.Schema({
@@ -91,19 +61,18 @@ const workforceDistributionSchema = new mongoose.Schema({
 // Esquema de población
 const populationSchema = new mongoose.Schema({
   totalPopulation: { type: String, required: true },
-  growthRate: { type: String, required: true },
-  populationGrowthRate: { type: String },
+  populationGrowthRate: { type: String, required: true },
   lifeExpectancy: lifeExpectancySchema,
   ethnicGroups: [ethnicGroupSchema],
   languages: [languageSchema],
   religions: [religionSchema],
-  urbanRuralDivide: urbanRuralDivideSchema,
+  urbanRuralSplit: urbanRuralSplitSchema,
   ageDistribution: ageDistributionSchema,
-  education: educationSchema,
-  healthCare: healthCareSchema,
+  educationLevel: { type: String, required: true },
+  health: healthCareSchema,
   migration: migrationSchema,
   workforceDistribution: [workforceDistributionSchema],
-  socialClasses: [socialClassSchema]
+  socialClasses: { type: String, required: true },
 });
 
 // Esquema principal

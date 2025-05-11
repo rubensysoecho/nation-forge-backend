@@ -189,7 +189,6 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
         config: {
             ...generationConfig,
             systemInstruction: nationSystemInstruction,
-            responseMimeType: "application/json",
         },
     });
 
