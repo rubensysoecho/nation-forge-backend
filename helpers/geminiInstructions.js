@@ -683,7 +683,53 @@ Otras características: {{other}}
 `;
 
 export const nationRandomPromptTemplate = `
-Me vas a generar una nación alternativa random en una época random de la humanidad, procura que la nación tenga características únicas y diversas.
+Genera una nación completamente ficticia y aleatoria. Quiero que crees:
+
+1. Un concepto único de nación basado en alguna de estas categorías (elige una aleatoriamente):
+   - TODAS LAS NACIONES DEBEN SER REALISTAS Y NO FICCIONARIAS. Es decir, no puedes crear una nación que no tenga sentido o que no pueda existir en la realidad.
+   - Una nación que se basa en una cultura antigua (ej. Egipto, Roma, Grecia, etc.)
+   - Reenacimiento de una civilización antigua (ej. Babilonia, Persia, etc.)
+   - Imperios caídos
+   - Una nación que recupera su antigua gloria
+   - Otra idea creativa que se te ocurras
+
+2. Un tipo de gobierno aleatorio que podría ser:
+   - Monarquía absoluta
+   - República parlamentaria
+   - Teocracia
+   - Gerontocracia
+   - Tecnocracia
+   - Oligarquía mercantil
+   - Democracia directa digital
+   - Federación tribal
+   - Dictadura militar
+   - Sistema rotativo de consejos
+   - Autocracia ilustrada
+   - Sistema de castas hereditario
+   - Tipo de gobierno único que se te ocurra
+
+3. Una época histórica aleatoria entre:
+   - Prehistoria (10000-3000 a.C.)
+   - Antigüedad (3000-500 a.C.)
+   - Periodo clásico (500 a.C.-500 d.C.)
+   - Alta Edad Media (500-1000 d.C.)
+   - Baja Edad Media (1000-1500)
+   - Renacimiento y Reforma (1500-1650)
+   - Era de la Ilustración (1650-1800)
+   - Era Industrial (1800-1914)
+   - Era de las Guerras Mundiales (1914-1945)
+   - Guerra Fría (1945-1991)
+   - Era Digital (1991-2025)
+
+4. Características adicionales aleatorias:
+   - Estabilidad política (muy inestable, inestable, moderada, estable, muy estable)
+   - Sistema económico único
+   - Moneda con características peculiares
+   - Distribución de riqueza característica
+   - Expectativa de vida distintiva
+   - Crecimiento poblacional atípico
+   - Renacimiento de culturas y religiones antiguas
+   - Otras características únicas que se te ocurran
 `;
 
 // War generation prompt template
