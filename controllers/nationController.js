@@ -84,7 +84,6 @@ const createNationGemini = async (req, res) => {
             console.log(`🧓 Esperanza de vida: ${req.body.lifeExpectancy}`);
             console.log(`👨‍👩‍👧‍👦 Crecimiento poblacional: ${req.body.populationGrowth}`);
             
-            console.log(`⏳ Generando detalles básicos de la nación...`);
             nationString = await generateNationAdvancedGemini(
                 req.body.nationName,
                 req.body.governmentType,
@@ -99,7 +98,6 @@ const createNationGemini = async (req, res) => {
                 req.body.other,
             );
         } else {
-            console.log(`⏳ Generando nación básica...`);
             nationString = await generateNationGemini(req.body.nationName, req.body.governmentType, req.body.age);
         }
         

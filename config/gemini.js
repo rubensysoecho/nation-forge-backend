@@ -262,59 +262,56 @@ async function generateNationAdvancedGemini(nationConcept, governmentType, age, 
 
     // Detalles básicos usando structured output
     console.log(`🧠 [Gemini] Generando información básica de la nación avanzada...`);
-    const result1 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: prompt }] }
-        ],
-        generationConfig: {
+
+    const chat = genAI.chats.create({
+        model: "gemini-2.0-flash",
+        config: {
             ...generationConfig,
-            response_schema: nationSchema
-        }
+            systemInstruction: nationSystemInstructionAdvanced,
+        },
     });
 
-    const json1 = getStructuredResponse(result1.response);
+    const result1 = await chat.sendMessage({
+        message: prompt,
+    })
+    const json1 = JSON.parse(cleanJsonResponse(result1.text));
+
     console.log(`✅ [Gemini] Información básica avanzada generada: ${json1.name}`);
 
     // Política usando structured output
     console.log(`🧠 [Gemini] Generando detalles políticos avanzados...`);
-    const result2 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: politicsDetailsPrompt }] }
-        ],
-        generationConfig: {
-            ...generationConfig,
-            response_schema: politicsSchema
+    const result2 = await chat.sendMessage({
+        message: politicsDetailsPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: politicsSchema
         }
     });
-    const json2 = getStructuredResponse(result2.response);
-    console.log(`✅ [Gemini] Detalles políticos avanzados generados: ${json2.governmentType}`);
+    const json2 = JSON.parse(cleanJsonResponse(result2.text));
+   console.log(`✅ [Gemini] Detalles políticos avanzados generados: ${json2.governmentType}`);
 
     // Economía usando structured output
     console.log(`🧠 [Gemini] Generando detalles económicos avanzados...`);
-    const result3 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: economicDetailsPrompt }] }
-        ],
-        generationConfig: {
-            ...generationConfig,
-            response_schema: economySchema
+    const result3 = await chat.sendMessage({
+        message: economicDetailsPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: economySchema
         }
     });
-    const json3 = getStructuredResponse(result3.response);
+    const json3 = JSON.parse(cleanJsonResponse(result3.text));
     console.log(`✅ [Gemini] Detalles económicos avanzados generados: Sistema ${json3.economicSystem}, Moneda: ${json3.currencyName}`);
 
     // Demografía usando structured output
     console.log(`🧠 [Gemini] Generando detalles demográficos avanzados...`);
-    const result4 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: populationDetailsPrompt }] }
-        ],
-        generationConfig: {
-            ...generationConfig,
-            response_schema: populationSchema
+    const result4 = await chat.sendMessage({
+        message: populationDetailsPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: populationSchema
         }
     });
-    const json4 = getStructuredResponse(result4.response);
+    const json4 = JSON.parse(cleanJsonResponse(result4.text));
     console.log(`✅ [Gemini] Detalles demográficos avanzados generados: Población ${json4.populationSize}, Esperanza de vida: ${json4.lifeExpectancy}`);
 
     json1.politicsDetails = json2;
@@ -335,60 +332,60 @@ async function generateNationRandomGemini() {
 
     // Detalles básicos usando structured output
     console.log(`🧠 [Gemini] Generando información básica aleatoria...`);
-    const result1 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: prompt }] }
-        ],
-        generationConfig: {
+    const chat = genAI.chats.create({
+        model: "gemini-2.0-flash",
+        config: {
             ...generationConfig,
-            response_schema: nationSchema
-        }
+            systemInstruction: nationRandomPromptTemplate,
+        },
     });
 
-    const json1 = getStructuredResponse(result1.response);
-    console.log(`✅ [Gemini] Información básica aleatoria generada: ${json1.name}`);
-    console.log(`🎲 [Gemini] Contexto histórico aleatorio generado de ${json1.historicalContext.length} caracteres`);
+    const result1 = await chat.sendMessage({
+        message: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: nationSchema
+        }
+    })
+    const json1 = JSON.parse(cleanJsonResponse(result1.text));
+
+   console.log(`✅ [Gemini] Información básica aleatoria generada: ${json1.name}`);
+   console.log(`🎲 [Gemini] Contexto histórico aleatorio generado de ${json1.historicalContext.length} caracteres`);
 
     // Política usando structured output
     console.log(`🧠 [Gemini] Generando detalles políticos aleatorios...`);
-    const result2 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: politicsDetailsPrompt }] }
-        ],
-        generationConfig: {
-            ...generationConfig,
-            response_schema: politicsSchema
+    const result2 = await chat.sendMessage({
+        message: politicsDetailsPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: politicsSchema
         }
     });
-    const json2 = getStructuredResponse(result2.response);
+    const json2 = JSON.parse(cleanJsonResponse(result2.text));
     console.log(`✅ [Gemini] Detalles políticos aleatorios generados: ${json2.governmentType}, Estabilidad: ${json2.politicalStability}`);
 
     // Economía usando structured output
     console.log(`🧠 [Gemini] Generando detalles económicos aleatorios...`);
-    const result3 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: economicDetailsPrompt }] }
-        ],
-        generationConfig: {
-            ...generationConfig,
-            response_schema: economySchema
+    const result3 = await chat.sendMessage({
+        message: economicDetailsPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: economySchema
         }
     });
-    const json3 = getStructuredResponse(result3.response);
+    const json3 = JSON.parse(cleanJsonResponse(result3.text));
     console.log(`✅ [Gemini] Detalles económicos aleatorios generados: Sistema ${json3.economicSystem}, Moneda: ${json3.currencyName}`);
 
     // Demografía usando structured output
     console.log(`🧠 [Gemini] Generando detalles demográficos aleatorios...`);
-    const result4 = await nationModel.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: populationDetailsPrompt }] }
-        ],
-        generationConfig: {
-            ...generationConfig,
-            response_schema: populationSchema
+    const result4 = await chat.sendMessage({
+        message: populationDetailsPrompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: populationSchema
         }
     });
-    const json4 = getStructuredResponse(result4.response);
+    const json4 = JSON.parse(cleanJsonResponse(result4.text));
     console.log(`✅ [Gemini] Detalles demográficos aleatorios generados: Población ${json4.populationSize}, Crecimiento: ${json4.populationGrowth}`);
 
     console.log(`🧩 [Gemini] Combinando todas las partes de la nación aleatoria...`);

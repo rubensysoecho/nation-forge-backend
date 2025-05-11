@@ -672,7 +672,7 @@ Tipo de gobierno: {{governmentType}}
 `;
 
 export const nationAdvancedPromptTemplate = `
-Me vas a generar lo siguiente:
+Me vas a generar lo siguiente (si algunos campos están vacíos, null o undefined, generalos tu mismo):
 Nacion: {{nationConcept}}
 Tipo de gobierno: {{governmentType}}
 Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
@@ -687,6 +687,7 @@ Otras características: {{other}}
 `;
 
 export const nationRandomPromptTemplate = `
+Respuesta en español.
 Genera una nación completamente ficticia y aleatoria. Quiero que crees:
 
 1. Un concepto único de nación basado en alguna de estas categorías (elige una aleatoriamente):
