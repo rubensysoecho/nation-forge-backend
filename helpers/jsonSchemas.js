@@ -405,6 +405,8 @@ export const populationSchema = {
       required: ["medianAge", "ageBrackets", "dependencyRatio"]
     },
     educationLevel: { type: Type.STRING },
+    literacyRate: { type: Type.STRING },
+    populationDensity: { type: Type.STRING },
     health: {
       type: Type.OBJECT,
       properties: {
