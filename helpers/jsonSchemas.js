@@ -341,11 +341,8 @@ export const populationSchema = {
       items: {
         type: Type.OBJECT,
         properties: {
-          name: { type: Type.STRING },
-          percentage: { type: Type.STRING },
-          details: { type: Type.STRING },
-          // Campos alternativos que pueden aparecer en la respuesta de Gemini
           groupName: { type: Type.STRING },
+          percentage: { type: Type.STRING },
           notes: { type: Type.STRING }
         },
         required: [] // Se deja vacío para permitir ambos formatos
@@ -356,11 +353,8 @@ export const populationSchema = {
       items: {
         type: Type.OBJECT,
         properties: {
-          name: { type: Type.STRING },
-          usage: { type: Type.STRING },
-          status: { type: Type.STRING },
-          // Campos alternativos que pueden aparecer en la respuesta de Gemini
           languageName: { type: Type.STRING },
+          status: { type: Type.STRING },
           percentageSpeakers: { type: Type.STRING }
         },
         required: [] // Se deja vacío para permitir ambos formatos
@@ -371,12 +365,9 @@ export const populationSchema = {
       items: {
         type: Type.OBJECT,
         properties: {
-          name: { type: Type.STRING },
-          percentage: { type: Type.STRING },
-          influence: { type: Type.STRING },
-          // Campos alternativos que pueden aparecer en la respuesta de Gemini
           religionName: { type: Type.STRING },
-          percentageAdherents: { type: Type.STRING }
+          percentageAdherents: { type: Type.STRING },
+          influence: { type: Type.STRING }
         },
         required: [] // Se deja vacío para permitir ambos formatos
       }
@@ -389,13 +380,7 @@ export const populationSchema = {
         majorCities: {
           type: Type.ARRAY,
           items: {
-            type: Type.OBJECT,
-            properties: {
-              name: { type: Type.STRING },
-              population: { type: Type.STRING },
-              significance: { type: Type.STRING }
-            },
-            required: ["name", "population", "significance"]
+            type: Type.STRING,
           }
         }
       },
@@ -420,28 +405,10 @@ export const populationSchema = {
       },
       required: ["medianAge", "ageBrackets", "dependencyRatio"]
     },
-    education: {
+    educationLevel: { type: Type.STRING },
+    health: {
       type: Type.OBJECT,
       properties: {
-        literacyRate: { type: Type.STRING },
-        educationSystem: { type: Type.STRING },
-        educationalInstitutions: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING }
-        },
-        educationLevel: { type: Type.STRING }
-      },
-      required: ["literacyRate", "educationSystem", "educationalInstitutions"]
-    },
-    healthCare: {
-      type: Type.OBJECT,
-      properties: {
-        qualityLevel: { type: Type.STRING },
-        accessLevel: { type: Type.STRING },
-        majorChallenges: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING }
-        },
         infantMortalityRate: { type: Type.STRING },
         accessToHealthcare: { type: Type.STRING }
       },
