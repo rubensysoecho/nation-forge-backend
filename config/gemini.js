@@ -1,5 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GoogleGenAI, Type } from "@google/genai";
+import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import {
     nationSystemInstruction,
     nationSystemInstructionAdvanced,
@@ -10,7 +10,8 @@ import {
     nationPromptTemplate,
     nationAdvancedPromptTemplate,
     nationRandomPromptTemplate,
-    warPromptTemplate
+    warPromptTemplate,
+    nationImageInstruction
 } from "../helpers/geminiInstructions.js";
 import {
     nationSchema,
@@ -22,6 +23,7 @@ import {
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenAI({ apiKey });
+const openai = new OpenAI();
 
 const generationConfig = {
     temperature: 1,
@@ -30,6 +32,29 @@ const generationConfig = {
     maxOutputTokens: 8192,
     responseMimeType: "application/json",
 };
+
+async function generateOpenAiImage(nationConcept, governmentType, age) {
+    const prompt = await genAI.generateContent({
+        contents: [
+            { role: "user", parts: [{ text: `Genera la banddera para la nación: Nombre:${nationConcept}, Tipo de gobierno:${governmentType}, Epoca:${age}`}] }
+        ],
+        generationConfig: {
+            ...generationConfig,
+            systemInstruction: nationImageInstruction,
+        },
+    });
+
+    try {
+        const response = await openai.images.generate({
+            model: "gpt-image-1",
+            prompt: prompt,
+        });
+        return response;
+    } catch (error) {
+        console.error(`Error generating image for nation ${nation.name}: ${error.message}`);
+        throw new Error(`No se pudo generar la imagen para la nación ${nation.name}: ${error.message}`);
+    }
+}
 
 // Esta función la mantenemos para casos en los que no usemos structured output
 function cleanJsonResponse(text) {
@@ -431,4 +456,4 @@ async function generateWarGemini(nationA, nationB, casusBelli, age, optionalProm
     return JSON.stringify(json, null, 2);
 }
 
-export { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini, generateWarGemini }
+export { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini, generateWarGemini, generateOpenAiImage }

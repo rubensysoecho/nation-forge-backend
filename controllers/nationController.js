@@ -1,6 +1,17 @@
 import Nation from '../models/nation/nationModel.js';
 import { Event } from '../models/nation/events/eventModel.js';
-import { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini } from '../config/gemini.js';
+import { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini, generateOpenAiImage } from '../config/gemini.js';
+
+const generateImage = async (req, res) => {
+    try {
+        const { nationConcept, governmentType, age } = req.body;
+        const imageUrl = await generateOpenAiImage(nationConcept, governmentType, age);
+        res.status(200).json({ imageUrl });
+    } catch (error) {
+        console.error('Error generating image:', error);
+        res.status(500).json({ message: 'Error generating image', error: error.message });
+    }
+}
 
 // METODOS GET
 const getNations = async (req, res) => {

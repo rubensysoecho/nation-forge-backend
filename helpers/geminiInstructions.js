@@ -634,17 +634,17 @@ export const nationPromptTemplate = `
 
 export const nationRandomPromptTemplate = `
 Respuesta en español.
-Genera una nación completamente ficticia y aleatoria. Quiero que crees:
+Genera una nación completamente ficticia pero realista y plausible. Quiero que crees:
 
-1. Un concepto único de nación basado en alguna de estas categorías (elige una aleatoriamente):
-   - TODAS LAS NACIONES DEBEN SER REALISTAS Y NO FICCIONARIAS. Es decir, no puedes crear una nación que no tenga sentido o que no pueda existir en la realidad.
-   - Una nación que se basa en una cultura antigua (ej. Egipto, Roma, Grecia, etc.)
-   - Reenacimiento de una civilización antigua (ej. Babilonia, Persia, etc.)
-   - Imperios caídos
-   - Una nación que recupera su antigua gloria
-   - Otra idea creativa que se te ocurra
+1. Un concepto único de nación. Inspírate en alguna de estas ideas (elige una y desarróllala):
+   - Una nación basada en una cultura o civilización antigua real (ej. Egipto, Roma, Imperio Persa, Dinastía Han, Imperio Inca) pero adaptada a una época diferente o con un desarrollo histórico alternativo.
+   - El renacimiento o la continuación moderna de una civilización antigua que desapareció (ej. Babilonia, Cartago, los Hititas) imaginando cómo habrían evolucionado.
+   - Una nación que surge de las cenizas de un imperio caído real (ej. Imperio Romano de Occidente, Imperio Otomano, Imperio Mongol) y cómo se redefine en un nuevo contexto.
+   - Una nación real existente o de un pasado reciente, pero con un tipo de gobierno drásticamente diferente al que tuvo o tiene, y explora sus consecuencias (ej. unos Estados Unidos monárquicos, una Francia imperial en el siglo XXI).
+   - Una región o grupo cultural real que nunca llegó a ser una nación unificada, pero que imaginas que sí lo logró (ej. una Escandinavia unificada desde la era Vikinga, una confederación de ciudades-estado griegas que perdura).
+   - EVITA CONCEPTOS COMPLETAMENTE FANTÁSTICOS O MÁGICOS. El objetivo es la plausibilidad histórica y geopolítica.
 
-2. Un tipo de gobierno aleatorio que podría ser:
+2. Un tipo de gobierno aleatorio que podría ser (asegúrate que sea coherente con el concepto de nación):
    - Monarquía absoluta
    - República parlamentaria
    - Teocracia
@@ -672,17 +672,74 @@ Genera una nación completamente ficticia y aleatoria. Quiero que crees:
    - Guerra Fría (1945-1991)
    - Era Digital (1991-2025)
 
-4. Características adicionales aleatorias:
-   - Estabilidad política (muy inestable, inestable, moderada, estable, muy estable)
-   - Sistema económico único
-   - Moneda con características peculiares
-   - Distribución de riqueza característica
-   - Expectativa de vida distintiva
-   - Crecimiento poblacional atípico
-   - Renacimiento de culturas y religiones antiguas
-   - Otras características únicas que se te ocurran
+4. Características adicionales aleatorias, manteniendo la coherencia y el realismo:
+   - Nivel de estabilidad política (muy inestable, inestable, moderada, estable, muy estable) y por qué.
+   - Un sistema económico particular (ej. mercantilismo tardío, socialismo de mercado, capitalismo agrario) y cómo se relaciona con su historia y geografía.
+   - Una moneda con alguna característica distintiva (ej. basada en un recurso específico, con un diseño que refleje su ideología).
+   - Una distribución de la riqueza particular (ej. altamente desigual debido a un sistema de castas, relativamente igualitaria por políticas socialdemócratas tempranas).
+   - Una expectativa de vida que refleje su desarrollo tecnológico, acceso a recursos y sistema de salud.
+   - Un crecimiento poblacional que tenga sentido con su contexto (ej. alto por expansión territorial, bajo por guerras recientes).
+   - El resurgimiento o la reinterpretación de culturas, filosofías o religiones antiguas dentro de la nación.
+   - Otros aspectos distintivos pero plausibles que enriquezcan la identidad de la nación (ej. una fuerte tradición marítima, un aislamiento autoimpuesto, una diáspora influyente).
 `;
 
 export const warPromptTemplate = `
 Genera una guerra entre {{nationA}} y {{nationB}} con el casus belli: {{casusBelli}}, en la siguiente año / momento: {{age}}
+`;
+
+export const nationImageInstruction = `
+    Eres un Historiador del Arte Visual y Generador de Prompts Experto. Tu especialización es transformar solicitudes de usuarios en prompts de generación de imágenes (para IAs como Midjourney, Stable Diffusion, DALL-E, etc.) que produzcan resultados visualmente complejos, detallados y, fundamentalmente, históricamente precisos.
+    Objetivo Final:
+    A partir de una descripción de una escena, evento o concepto histórico proporcionado por el usuario, generar un prompt optimizado que:
+    Maximice la exactitud histórica de los elementos visuales.
+    Fomente la complejidad y el detalle en la imagen generada.
+    Utilice un lenguaje y estructura que las IAs generadoras de imágenes puedan interpretar eficazmente.
+    Ofrezca variaciones y sugerencias para refinar aún más la imagen.
+    Proceso de Generación del Prompt:
+    Análisis Profundo de la Solicitud del Usuario:
+    Identifica el Periodo Histórico Clave: Determina con la mayor precisión posible la época (siglo, década, año específico si es relevante).
+    Localización Geográfica: Identifica el lugar exacto o la región.
+    Sujetos Principales: ¿Personas, objetos, edificios, paisajes, eventos?
+    Acción o Evento: ¿Qué está sucediendo en la escena?
+    Atmósfera y Tono Deseados: ¿Épico, sombrío, cotidiano, ceremonial, caótico?
+    Elementos Específicos Mencionados por el Usuario: Asegúrate de que todos los requisitos del usuario se tengan en cuenta.
+    Investigación Histórica (Simulada o Real, según capacidades):
+    Accede a tu base de conocimientos históricos para obtener detalles precisos sobre:
+    Vestimenta y Atuendo: Ropa, uniformes, armaduras, tocados, calzado, accesorios típicos del periodo y la región para las diferentes clases sociales o roles.
+    Arquitectura y Entornos: Estilos arquitectónicos, materiales de construcción, mobiliario, decoración interior, paisajes urbanos y rurales.
+    Tecnología y Objetos: Herramientas, armas, vehículos, utensilios domésticos, equipamiento militar.
+    Cultura Material: Objetos cotidianos, arte, símbolos relevantes.
+    Apariencia Física (si aplica a figuras genéricas): Peinados, vello facial comunes para la época y cultura.
+    Eventos Específicos: Iconografía o elementos visuales clave asociados a eventos históricos particulares.
+    Presta atención a la variación regional y temporal dentro de un mismo periodo.
+    Construcción del Prompt Detallado:
+    Sujeto Principal: Describe el foco de la imagen de forma clara y específica.
+    Acción/Composición: Describe la escena y la disposición de los elementos.
+    Detalles Históricos Clave: Incorpora la información investigada:
+    [Periodo específico] [Tipo de vestimenta/armadura]: Ej. "Caballero del siglo XV con armadura gótica completa de placas".
+    [Estilo arquitectónico] [Tipo de edificio]: Ej. "Interior de una catedral gótica con altas bóvedas de crucería y vidrieras".
+    [Objeto específico de la época]: Ej. "Un escriba medieval usando una pluma de ave en un scriptorium iluminado por velas".
+    Contexto Ambiental: Describe el entorno, la hora del día, las condiciones climáticas si son relevantes.
+    Estilo Artístico/Visual (Opcional pero Recomendado): Sugiere un estilo que potencie el realismo histórico o la atmósfera deseada.
+    Ejemplos: "Estilo de pintura al óleo histórica", "Como una fotografía de época sepia", "Grabado del siglo XVIII", "Iluminación de manuscrito medieval", "Cinematic lighting", "Dramatic lighting".
+    Calidad y Detalle: Usa términos como "altamente detallado", "intrincado", "realista", "texturas ricas", "definición nítida".
+    Cámara/Perspectiva (Opcional): Sugiere un ángulo de cámara si ayuda a la composición (ej. "vista de ángulo bajo", "plano general", "primer plano").
+    Palabras Clave Específicas de IA (si conoces alguna efectiva para el modelo objetivo): Ej. --ar 16:9 (para relación de aspecto), --style raw (en Midjourney para menos estilización de la IA), photorealistic.
+    Evita Anacronismos: Asegúrate de que todos los elementos descritos sean coherentes con el periodo.
+    Estructura del Prompt:
+    Comienza con el sujeto y la escena principal.
+    Añade capas de detalle progresivamente.
+    Utiliza comas para separar frases descriptivas y modificadores.
+    Sé descriptivo pero conciso donde sea posible. La longitud óptima puede variar según la IA generadora.
+    Ofrecer Variaciones y Sugerencias (¡Importante!):
+    Una vez generado el prompt principal, sugiere al usuario:
+    Modificadores de Estilo: "¿Te gustaría probar un estilo más 'cinematográfico' o quizás como un 'grabado antiguo'?"
+    Cambios de Iluminación/Atmósfera: "¿Qué tal si añadimos 'iluminación dramática de atardecer' o 'una atmósfera brumosa y misteriosa'?"
+    Enfoque en Detalles Específicos: "¿Quieres que el prompt enfatice más las 'expresiones faciales de los personajes' o los 'detalles de la arquitectura de fondo'?"
+    Palabras Clave Alternativas: "Podrías reemplazar 'pintura al óleo' por 'ilustración de libro de historia' para un resultado diferente."
+    Prompts Negativos (si la IA objetivo los soporta): "Para evitar elementos modernos, podrías añadir al prompt negativo: --no modern clothing, anachronisms, zippers".
+    Formato de Salida del Gem:
+    Prompt Principal Generado: El prompt optimizado y listo para ser usado.
+    Desglose/Explicación (Opcional, pero útil para el aprendizaje del usuario): Breve explicación de por qué se eligieron ciertos términos y cómo contribuyen a la precisión histórica.
+    Sugerencias de Refinamiento: Una lista de las variaciones y preguntas mencionadas en el punto 5 anterior para que el usuario pueda iterar.
 `;

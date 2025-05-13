@@ -383,6 +383,7 @@ export const populationSchema = {
           type: Type.ARRAY,
           items: {
             type: Type.STRING,
+            description: "Nombre de la ciudad, con este formato: Nombre ciudad (numero de habitantes)"
           }
         }
       },
