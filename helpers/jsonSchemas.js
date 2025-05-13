@@ -344,7 +344,7 @@ export const populationSchema = {
           percentage: { type: Type.STRING },
           notes: { type: Type.STRING }
         },
-        required: [] // Se deja vacío para permitir ambos formatos
+        required: ["groupName", "percentage", "notes"]
       }
     },
     languages: {
@@ -356,7 +356,7 @@ export const populationSchema = {
           status: { type: Type.STRING },
           percentageSpeakers: { type: Type.STRING }
         },
-        required: [] // Se deja vacío para permitir ambos formatos
+        required: ["languageName", "status", "percentageSpeakers"]
       }
     },
     religions: {
@@ -364,11 +364,14 @@ export const populationSchema = {
       items: {
         type: Type.OBJECT,
         properties: {
-          religionName: { type: Type.STRING },
+          religionName: {
+            type: Type.STRING,
+            description: "El nombre conciso de la religión, sin explicaciones ni descripciones adicionales."
+          },
           percentageAdherents: { type: Type.STRING },
           influence: { type: Type.STRING }
         },
-        required: [] // Se deja vacío para permitir ambos formatos
+        required: ["religionName", "percentageAdherents", "influence"]
       }
     },
     urbanRuralSplit: {
@@ -445,6 +448,7 @@ export const populationSchema = {
   },
   required: [
     "totalPopulation", "ethnicGroups", "languages", "religions",
-    "urbanRuralSplit", "educationLevel", "health", "socialClasses"
+    "urbanRuralSplit", "educationLevel", "health", "socialClasses",
+    "literacyRate", "populationDensity"
   ]
 };

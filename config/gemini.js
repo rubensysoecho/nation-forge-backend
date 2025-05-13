@@ -7,7 +7,6 @@ import {
     politicsDetailsPrompt,
     economicDetailsPrompt,
     populationDetailsPrompt,
-    generationConfig,
     nationPromptTemplate,
     nationAdvancedPromptTemplate,
     nationRandomPromptTemplate,
@@ -23,6 +22,14 @@ import {
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenAI({ apiKey });
+
+const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+};
 
 // Esta función la mantenemos para casos en los que no usemos structured output
 function cleanJsonResponse(text) {
@@ -229,7 +236,8 @@ async function generateNationGemini(nationConcept, governmentType, age, optional
             responseSchema: populationSchema
         }
     })
-    const json4 = JSON.parse(cleanJsonResponse(result4.text));
+    const cleanedJsonString4 = cleanJsonResponse(result4.text);
+    const json4 = JSON.parse(cleanedJsonString4);
     console.log(`✅ [Gemini] Detalles demográficos generados: Población ${json4.populationSize}`);
 
     json1.politicsDetails = json2;
@@ -311,7 +319,8 @@ async function generateNationAdvancedGemini(nationConcept, governmentType, age, 
             responseSchema: populationSchema
         }
     });
-    const json4 = JSON.parse(cleanJsonResponse(result4.text));
+    const cleanedJsonString4 = cleanJsonResponse(result4.text);
+    const json4 = JSON.parse(cleanedJsonString4);
     console.log(`✅ [Gemini] Detalles demográficos avanzados generados: Población ${json4.populationSize}, Esperanza de vida: ${json4.lifeExpectancy}`);
 
     json1.politicsDetails = json2;
@@ -385,7 +394,8 @@ async function generateNationRandomGemini() {
             responseSchema: populationSchema
         }
     });
-    const json4 = JSON.parse(cleanJsonResponse(result4.text));
+    const cleanedJsonString4 = cleanJsonResponse(result4.text);
+    const json4 = JSON.parse(cleanedJsonString4);
     console.log(`✅ [Gemini] Detalles demográficos aleatorios generados: Población ${json4.populationSize}, Crecimiento: ${json4.populationGrowth}`);
 
     console.log(`🧩 [Gemini] Combinando todas las partes de la nación aleatoria...`);

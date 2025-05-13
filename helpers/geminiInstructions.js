@@ -452,7 +452,7 @@ Formato de Salida Obligatorio: Por favor proporciona la información política d
 `;
 
 export const economicDetailsPrompt = `
-Contexto: Ya has generado previamente una nación ficticia con sus características definidas (geografía, cultura, política, historia, demografía, etc.).
+Contexto: Ya has generado previamente una nación ficticia con sus características definidas (geografía, cultura, política, economía, historia, demografía, etc.).
 
 Tarea: Profundiza en el sistema económico de esa nación. Asegúrate de que los detalles económicos que generes sean coherentes y plausibles con todos los rasgos previamente establecidos de la nación, incluyendo su geografía (para recursos naturales), sistema político (para leyes y regulaciones) y relaciones exteriores (para comercio). Incluye específicamente detalles sobre recursos naturales, leyes económicas y política comercial.
 
@@ -529,161 +529,107 @@ Contexto: Ya has generado previamente una nación ficticia con sus característi
 
 Tarea: Profundiza en la demografía de esa nación. Asegúrate de que los detalles demográficos que generes sean coherentes y plausibles con todos los rasgos previamente establecidos de la nación, como su geografía (afectando la densidad y distribución), cultura (grupos étnicos, idiomas, religiones), economía (profesiones, nivel de vida) y política (estabilidad, migración). Incluye específicamente detalles sobre el número total de personas, la composición cultural/étnica y la distribución de profesiones, y proporciona un análisis lo más exhaustivo posible.
 
-Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON que se muestra a continuación, rellenando todos sus campos con la información demográfica generada. No incluyas ningún texto introductorio o explicativo fuera del JSON. El esquema a seguir es:
+Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON que se muestra a continuación, rellenando todos sus campos con la información demográfica generada. No incluyas ningún texto introductorio o explicativo fuera del JSON.
 
 {
-    "totalPopulation": "Número estimado de habitantes",
-    "growthRate": "Tasa de crecimiento poblacional",
-    "lifeExpectancy": {
-        "male": "Esperanza de vida para hombres",
-        "female": "Esperanza de vida para mujeres",
-        "overall": "Esperanza de vida general"
-    },
-    "ethnicGroups": [
-        {
-            "name": "Nombre del grupo étnico",
-            "percentage": "Porcentaje que representa",
-            "details": "Información adicional relevante"
-        },
-        {
-            "groupName": "[Nombre del Grupo Étnico/Cultural Principal]",
-            "percentage": "[Porcentaje Estimado de la Población]",
-            "notes": "[Notas breves sobre su origen, distribución o estatus (ej. 'Grupo fundador', 'Concentrado en el norte', 'Dominante políticamente') - coherente con cultura/historia/política]"
-        },
-        {
-            "groupName": "[Nombre de Minoría Étnica/Cultural Significativa]",
-            "percentage": "[Porcentaje Estimado de la Población]",
-            "notes": "[Notas breves]"
-        }
-        // Añade más objetos para otros grupos étnicos/culturales relevantes
+  "totalPopulation": "[Número estimado de habitantes]",
+  "populationGrowthRate": "[Tasa de crecimiento poblacional (ej. 1.5% anual)]",
+  "lifeExpectancy": {
+    "male": "[Esperanza de vida para hombres]",
+    "female": "[Esperanza de vida para mujeres]",
+    "overall": "[Esperanza de vida general]"
+  },
+  "ethnicGroups": [
+    {
+      "groupName": "[Nombre del grupo étnico]",
+      "percentage": "[Porcentaje de la población]",
+      "notes": "[Notas adicionales]"
+    }
+    // Añade más grupos étnicos si es necesario
+  ],
+  "languages": [
+    {
+      "languageName": "[Nombre del idioma]",
+      "status": "[Estatus oficial/regional/minoritario]",
+      "percentageSpeakers": "[Porcentaje de hablantes]"
+    }
+    // Añade más idiomas si es necesario
+  ],
+  "religions": [
+    {
+      "religionName": "[Nombre conciso de la religión]",
+      "percentageAdherents": "[Porcentaje de seguidores]",
+      "influence": "[Nivel de influencia (alto, medio, bajo)]"
+    }
+    // Añade más religiones si es necesario
+  ],
+  "urbanRuralSplit": {
+    "urbanPercentage": "[Porcentaje de población urbana]",
+    "ruralPercentage": "[Porcentaje de población rural]",
+    "majorCities": [
+      "[Nombre de ciudad principal 1]",
+      "[Nombre de ciudad principal 2]"
+      // Añade más ciudades principales
+    ]
+  },
+  "ageDistribution": {
+    "medianAge": "[Edad mediana de la población]",
+    "ageBrackets": [
+      {
+        "bracket": "[Rango de edad (ej. 0-14 años)]",
+        "percentage": "[Porcentaje en este rango]"
+      }
+      // Añade más rangos de edad
     ],
-    "languages": [
-        {
-            "name": "Nombre del idioma",
-            "usage": "Porcentaje o descripción de uso",
-            "status": "Oficial, regional, minoritario, etc."
-        },
-        {
-            "languageName": "[Nombre del Idioma Oficial/Principal]",
-            "status": "[Estatus (Oficial, Mayoritario, Lingua Franca)]",
-            "percentageSpeakers": "[Porcentaje Estimado de Hablantes (nativos + L2)]"
-        },
-        {
-            "languageName": "[Nombre de Idioma Minoritario Relevante]",
-            "status": "[Estatus (Regional, Minoritario, En Peligro)]",
-            "percentageSpeakers": "[Porcentaje Estimado de Hablantes]"
-        }
-        // Añade más objetos para otros idiomas relevantes
-    ],
-    "religions": [
-        {
-            "name": "Nombre de la religión",
-            "percentage": "Porcentaje de seguidores",
-            "influence": "Nivel de influencia social/política"
-        },
-        {
-            "religionName": "[Nombre de la Religión/Creencia Principal]",
-            "percentageAdherents": "[Porcentaje Estimado de Adherentes]",
-            "influence": "[Nivel de Influencia en la Sociedad/Política (alto, medio, bajo) - coherente con política/cultura]"
-        },
-        {
-            "religionName": "[Nombre de Religión/Creencia Minoritaria Relevante]",
-            "percentageAdherents": "[Porcentaje Estimado de Adherentes]",
-            "influence": "[Nivel de Influencia]"
-        }
-        // Añade más objetos para otras religiones/creencias relevantes
-    ],
-    "urbanRuralDivide": {
-        "urbanPercentage": "Porcentaje de población urbana",
-        "ruralPercentage": "Porcentaje de población rural",
-        "majorCities": [
-            {
-                "name": "Nombre de la ciudad",
-                "population": "Población aproximada",
-                "significance": "Importancia económica, cultural, etc."
-            }
-        ]
-    },
-    "education": {
-        "literacyRate": "Tasa de alfabetización",
-        "educationSystem": "Descripción del sistema educativo",
-        "educationalInstitutions": ["Instituciones educativas destacadas"],
-        "educationLevel": "[Nivel Educativo Promedio (ej. 'Primaria completa', 'Secundaria incompleta', 'Alto nivel en centros urbanos')]"
-    },
-    "healthCare": {
-        "qualityLevel": "Nivel de calidad de la atención médica",
-        "accessLevel": "Accesibilidad a servicios médicos",
-        "majorChallenges": ["Principales desafíos sanitarios"],
-        "infantMortalityRate": "[Tasa de Mortalidad Infantil Estimada (por 1000 nacidos vivos)]",
-        "accessToHealthcare": "[Nivel de Acceso a la Sanidad (universal, limitado, privado, bueno en ciudades/malo en zonas rurales)]"
-    },
-    "socialClasses": [
-        {
-            "name": "Nombre de la clase social",
-            "percentage": "Porcentaje aproximado",
-            "economicStatus": "Estado económico",
-            "politicalInfluence": "Nivel de influencia política"
-        }
-    ],
-    "ageDistribution": {
-        "medianAge": "[Edad Mediana de la Población]",
-        "ageBrackets": [
-            {"bracket": "0-14 años", "percentage": "[Porcentaje Estimado]"},
-            {"bracket": "15-64 años", "percentage": "[Porcentaje Estimado]"},
-            {"bracket": "65+ años", "percentage": "[Porcentaje Estimado]"}
-        ],
-        "dependencyRatio": "[Ratio de Dependencia Estimado (jóvenes + mayores / población activa)]"
-    },
-    "migration": {
-        "immigrationRate": "[Tasa de Inmigración Estimada (alta, media, baja, negativa)]",
-        "emigrationRate": "[Tasa de Emigración Estimada (alta, media, baja, negativa)]",
-        "mainOriginsDestinations": "[Principales Países de Origen (inmigrantes) y Destino (emigrantes) - coherente con política exterior/economía]"
-    },
-    "workforceDistribution": [
-        {
-            "sector": "[Sector Económico (Primario - Agricultura/Minería, Secundario - Manufactura/Construcción, Terciario - Servicios/Comercio, Cuaternario - Información/Tecnología)]",
-            "percentage": "[Porcentaje Estimado de la Fuerza Laboral]",
-            "dominantProfessions": [
-                "[Profesión Típica 1]",
-                "[Profesión Típica 2]"
-                // Añade más profesiones dominantes en este sector
-            ]
-        }
-        // Añade más objetos para otros sectores económicos relevantes
-        // Asegúrate de que la suma de porcentajes sea cercana al 100% de la fuerza laboral activa
-    ],
-    "populationGrowthRate": "[Tasa de Crecimiento Poblacional Anual Estimada (positiva, negativa, estable, porcentaje)]"
+    "dependencyRatio": "[Ratio de dependencia]"
+  },
+  "educationLevel": "[Descripción general del nivel educativo y sistema educativo]",
+  "literacyRate": "[Tasa de alfabetización (ej. 90%)]",
+  "populationDensity": "[Densidad de población (habitantes por km²)]",
+  "health": {
+    "infantMortalityRate": "[Tasa de mortalidad infantil por 1000 nacidos vivos]",
+    "accessToHealthcare": "[Nivel de acceso a la atención médica (bueno, moderado, pobre)]"
+  },
+  "migration": {
+    "immigrationRate": "[Tasa de inmigración]",
+    "emigrationRate": "[Tasa de emigración]",
+    "mainOriginsDestinations": "[Principales países de origen y destino migratorio]"
+  },
+  "workforceDistribution": [
+    {
+      "sector": "[Sector económico (ej. Agricultura, Industria, Servicios)]",
+      "percentage": "[Porcentaje de la fuerza laboral en este sector]",
+      "dominantProfessions": [
+        "[Profesión dominante 1 en el sector]",
+        "[Profesión dominante 2 en el sector]"
+      ]
+    }
+    // Añade más sectores
+  ],
+  "socialClasses": "[Descripción de la estructura de clases sociales (ej. Alta, Media, Baja y sus características)]"
 }
 `;
 
-export const generationConfig = {
-    temperature: 1,
-    topP: 0.95,
-    topK: 64,
-    maxOutputTokens: 8192,
-    responseMimeType: "application/json",
-};
-
-export const nationPromptTemplate = `
-Me vas a generar lo siguiente:
-Nacion: {{nationConcept}}
-Tipo de gobierno: {{governmentType}}
-Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
+export const nationAdvancedPromptTemplate = `
+    Me vas a generar lo siguiente (si algunos campos están vacíos, null o undefined, generalos tu mismo):
+    Nacion: {{nationConcept}}
+    Tipo de gobierno: {{governmentType}}
+    Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
+    Nombre del lider: {{leaderName}}
+    Porcentaje de estabilidad politica: {{politicalStability}}
+    Nombre del sistema económico: {{economicSystem}}
+    Nombre de la moneda: {{currencyName}}
+    Distribuición de la riqueza: {{wealthDistribution}}
+    Expectancia de años de vida: {{lifeExpectancy}}
+    Crecimiento poblacional: {{populationGrowth}}
+    Otras características: {{other}}
 `;
 
-export const nationAdvancedPromptTemplate = `
-Me vas a generar lo siguiente (si algunos campos están vacíos, null o undefined, generalos tu mismo):
-Nacion: {{nationConcept}}
-Tipo de gobierno: {{governmentType}}
-Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
-Nombre del lider: {{leaderName}}
-Porcentaje de estabilidad politica: {{politicalStability}}
-Nombre del sistema económico: {{economicSystem}}
-Nombre de la moneda: {{currencyName}}
-Distribuición de la riqueza: {{wealthDistribution}}
-Expectancia de años de vida: {{lifeExpectancy}}
-Crecimiento poblacional: {{populationGrowth}}
-Otras características: {{other}}
+export const nationPromptTemplate = `
+    Me vas a generar lo siguiente:
+    Nacion: {{nationConcept}}
+    Tipo de gobierno: {{governmentType}}
+    Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
 `;
 
 export const nationRandomPromptTemplate = `
@@ -696,7 +642,7 @@ Genera una nación completamente ficticia y aleatoria. Quiero que crees:
    - Reenacimiento de una civilización antigua (ej. Babilonia, Persia, etc.)
    - Imperios caídos
    - Una nación que recupera su antigua gloria
-   - Otra idea creativa que se te ocurras
+   - Otra idea creativa que se te ocurra
 
 2. Un tipo de gobierno aleatorio que podría ser:
    - Monarquía absoluta

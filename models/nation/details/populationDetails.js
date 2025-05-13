@@ -69,6 +69,8 @@ const populationSchema = new mongoose.Schema({
   urbanRuralSplit: urbanRuralSplitSchema,
   ageDistribution: ageDistributionSchema,
   educationLevel: { type: String, required: true },
+  literacyRate: { type: String }, // Añadido literacyRate
+  populationDensity: { type: String }, // Añadido populationDensity
   health: healthCareSchema,
   migration: migrationSchema,
   workforceDistribution: [workforceDistributionSchema],
