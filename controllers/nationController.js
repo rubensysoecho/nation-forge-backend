@@ -4,14 +4,18 @@ import { generateNationGemini, generateNationAdvancedGemini, generateNationRando
 
 const generateImage = async (req, res) => {
     try {
-        const { nationConcept, governmentType, age } = req.body;
-        const imageUrl = await generateOpenAiImage(nationConcept, governmentType, age);
+        const nationId = req.params.nationId;
+        const nation = await Nation.findById(nationId);
+        if (!nation) {
+            return res.status(404).json({ message: 'Nation not found' });
+        }
+        const imageUrl = await generateOpenAiImage(nation.name, nation.governmentType, nation.age);
         res.status(200).json({ imageUrl });
     } catch (error) {
         console.error('Error generating image:', error);
         res.status(500).json({ message: 'Error generating image', error: error.message });
     }
-}
+};
 
 // METODOS GET
 const getNations = async (req, res) => {
@@ -21,6 +25,24 @@ const getNations = async (req, res) => {
     } catch (error) {
         console.error(error); // Usa console.error para errores
         res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+    }
+};
+
+const getMonthlyNation = async (req, res) => {
+    try {
+        console.log("🌏 Controller: Attempting to get monthly nation...");
+        const nation = await Nation.findOne({ monthlyWinner: true }).select('name _id');
+
+        if (!nation) {
+            console.log("ℹ️ Controller: No nation found with monthlyWinner: true.");
+            return res.status(404).send({ msg: "Monthly nation not found" });
+        }
+
+        console.log(`✅ Controller: Monthly nation found: ${nation.name}`);
+        res.send(nation);
+    } catch (error) {
+        console.error("❌ Controller: Error in getMonthlyNation:", error);
+        res.status(500).send({ msg: "Error retrieving monthly nation", error: error.message });
     }
 };
 
@@ -58,7 +80,7 @@ const getNationsUserSimple = async (req, res) => {
 
 const getNationDetails = async (req, res) => {
     try {
-        const nationId = req.params.nationId; // Cambiado de req.query.nationId
+        const nationId = req.params.nationId;
 
         if (!nationId) {
             return res.status(400).send({ msg: "nationId is required in query parameters" });
@@ -432,10 +454,12 @@ export {
     getNationsUser,
     getNationsUserSimple,
     getNationDetails,
+    getMonthlyNation,
     //createNation,
     createNationGemini,
     createRandomNation,
     addEvent,
     deleteNation,
-    updateNation
+    updateNation,
+    generateImage
 }

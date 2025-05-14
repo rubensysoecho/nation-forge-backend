@@ -64,7 +64,11 @@ const nationSchema = new Schema({
     creator: {
         type: String,
         required: true
-    }
+    },
+    monthlyWinner: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const Nation = mongoose.model("Nation", nationSchema);

@@ -20,10 +20,11 @@ import {
     economySchema,
     populationSchema
 } from "../helpers/jsonSchemas.js";
+import fs from "fs";
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenAI({ apiKey });
-const openai = new OpenAI();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const generationConfig = {
     temperature: 1,
@@ -34,25 +35,31 @@ const generationConfig = {
 };
 
 async function generateOpenAiImage(nationConcept, governmentType, age) {
-    const prompt = await genAI.generateContent({
-        contents: [
-            { role: "user", parts: [{ text: `Genera la banddera para la nación: Nombre:${nationConcept}, Tipo de gobierno:${governmentType}, Epoca:${age}`}] }
-        ],
-        generationConfig: {
+    console.log(`🖼️ Generando imagen para la nación ${nationConcept}...`);
+    const prompt = await genAI.models.generateContent({
+        model: "gemini-2.0-flash",
+        config: {
             ...generationConfig,
-            systemInstruction: nationImageInstruction,
+            systemInstruction: nationSystemInstruction,
         },
+        contents: [
+            { role: "user", parts: [{ text: `Genera la bandera para la nación: Nombre:${nationConcept}, Tipo de gobierno:${governmentType}, Epoca:${age}`}] }
+        ],
     });
 
+    console.log(`🖼️ Generando imagen con OpenAI...`);
     try {
         const response = await openai.images.generate({
             model: "gpt-image-1",
-            prompt: prompt,
+            prompt: prompt.text,
         });
+
+        const image_base64 = response.data[0].b64_json;
+        const image_bytes = Buffer.from(image_base64, "base64");
+        fs.writeFileSync("gen.png", image_bytes);
         return response;
     } catch (error) {
-        console.error(`Error generating image for nation ${nation.name}: ${error.message}`);
-        throw new Error(`No se pudo generar la imagen para la nación ${nation.name}: ${error.message}`);
+        console.error(`Error generating image for nation ${nationConcept}: ${error.message}`);
     }
 }
 
