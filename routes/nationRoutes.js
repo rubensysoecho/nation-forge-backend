@@ -7,6 +7,7 @@ import {
     getNationsUserSimple,
     getNationDetails,
     getMonthlyNation,
+    getNationCreator,
     addEvent,
     deleteNation,
     updateNation,
@@ -22,6 +23,7 @@ router.get('/simple/:userId', getNationsUserSimple);
 router.get('/:userId', getNationsUser);
 router.get('/details/:nationId', getNationDetails);
 router.get('/details/:nationId/generateImage', generateImage);
+router.get('/details/:nationId/creator', getNationCreator);
 
 // CREAR
 router.post('/', createNationGemini);

@@ -46,6 +46,21 @@ const getMonthlyNation = async (req, res) => {
     }
 };
 
+const getNationCreator = async (req, res) => {
+    try {
+        const nationId = req.params.nationId; // Cambiado de req.query.nationId
+        const nation = await Nation.findById(nationId);
+        if (!nation) {
+            return res.status(404).json({ message: 'Nation not found' });
+        }
+        const creatorId = nation.creator;
+        res.status(200).json({ creatorId });
+    } catch (error) {
+        console.error('Error retrieving nation creator:', error);
+        res.status(500).json({ message: 'Error retrieving nation creator', error: error.message });
+    }
+};
+
 const getNationsUser = async (req, res) => {
     try {
         const userId = req.params.userId; // Obtiene el userId de los query parameters
@@ -455,6 +470,7 @@ export {
     getNationsUserSimple,
     getNationDetails,
     getMonthlyNation,
+    getNationCreator,
     //createNation,
     createNationGemini,
     createRandomNation,
