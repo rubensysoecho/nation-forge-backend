@@ -12,10 +12,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/genai": "^0.13.0",
     "@google/generative-ai": "^0.22.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "firebase-admin": "^13.4.0",
     "mongoose": "^8.9.6",
     "openai": "^4.82.0"
   },

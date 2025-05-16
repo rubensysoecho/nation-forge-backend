@@ -6,18 +6,24 @@ import {
     getNationsUser, 
     getNationsUserSimple,
     getNationDetails,
+    getMonthlyNation,
+    getNationCreator,
     addEvent,
     deleteNation,
-    updateNation 
+    updateNation,
+    generateImage,
 } from '../controllers/nationController.js';
 
 const router = express.Router();
 
 // LEER
 router.get('/', getNations);
+router.get('/monthly', getMonthlyNation);
 router.get('/simple/:userId', getNationsUserSimple);
 router.get('/:userId', getNationsUser);
 router.get('/details/:nationId', getNationDetails);
+router.get('/details/:nationId/generateImage', generateImage);
+router.get('/details/:nationId/creator', getNationCreator);
 
 // CREAR
 router.post('/', createNationGemini);

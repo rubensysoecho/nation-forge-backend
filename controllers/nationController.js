@@ -1,6 +1,21 @@
 import Nation from '../models/nation/nationModel.js';
 import { Event } from '../models/nation/events/eventModel.js';
-import { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini } from '../config/gemini.js';
+import { generateNationGemini, generateNationAdvancedGemini, generateNationRandomGemini, generateOpenAiImage } from '../config/gemini.js';
+
+const generateImage = async (req, res) => {
+    try {
+        const nationId = req.params.nationId;
+        const nation = await Nation.findById(nationId);
+        if (!nation) {
+            return res.status(404).json({ message: 'Nation not found' });
+        }
+        const imageUrl = await generateOpenAiImage(nation.name, nation.governmentType, nation.age);
+        res.status(200).json({ imageUrl });
+    } catch (error) {
+        console.error('Error generating image:', error);
+        res.status(500).json({ message: 'Error generating image', error: error.message });
+    }
+};
 
 // METODOS GET
 const getNations = async (req, res) => {
@@ -10,6 +25,39 @@ const getNations = async (req, res) => {
     } catch (error) {
         console.error(error); // Usa console.error para errores
         res.status(500).send({ msg: "Error retrieving nations", error: error.message }); // Añade el mensaje de error
+    }
+};
+
+const getMonthlyNation = async (req, res) => {
+    try {
+        console.log("🌏 Controller: Attempting to get monthly nation...");
+        const nation = await Nation.findOne({ monthlyWinner: true }).select('name _id');
+
+        if (!nation) {
+            console.log("ℹ️ Controller: No nation found with monthlyWinner: true.");
+            return res.status(404).send({ msg: "Monthly nation not found" });
+        }
+
+        console.log(`✅ Controller: Monthly nation found: ${nation.name}`);
+        res.send(nation);
+    } catch (error) {
+        console.error("❌ Controller: Error in getMonthlyNation:", error);
+        res.status(500).send({ msg: "Error retrieving monthly nation", error: error.message });
+    }
+};
+
+const getNationCreator = async (req, res) => {
+    try {
+        const nationId = req.params.nationId; // Cambiado de req.query.nationId
+        const nation = await Nation.findById(nationId);
+        if (!nation) {
+            return res.status(404).json({ message: 'Nation not found' });
+        }
+        const creatorId = nation.creator;
+        res.status(200).json({ creatorId });
+    } catch (error) {
+        console.error('Error retrieving nation creator:', error);
+        res.status(500).json({ message: 'Error retrieving nation creator', error: error.message });
     }
 };
 
@@ -47,7 +95,7 @@ const getNationsUserSimple = async (req, res) => {
 
 const getNationDetails = async (req, res) => {
     try {
-        const nationId = req.params.nationId; // Cambiado de req.query.nationId
+        const nationId = req.params.nationId;
 
         if (!nationId) {
             return res.status(400).send({ msg: "nationId is required in query parameters" });
@@ -69,9 +117,21 @@ const getNationDetails = async (req, res) => {
 // METODOS POST
 const createNationGemini = async (req, res) => {
     try {
-        console.log(`🌏 Generando nacion...`)
+        console.log(`🌏 Iniciando generación de nación...`);
+        console.log(`📋 Parámetros: nombre=${req.body.nationName}, gobierno=${req.body.governmentType}, era=${req.body.age}`);
+        console.log(`🔄 Modo: ${req.body.advanced ? 'Avanzado' : 'Básico'}`);
+        
         var nationString = "";
         if (req.body.advanced == true) {
+            console.log(`🔍 Generando nación avanzada con parámetros adicionales:`);
+            console.log(`👑 Líder: ${req.body.leaderName}`);
+            console.log(`📊 Estabilidad política: ${req.body.politicalStability}`);
+            console.log(`💰 Sistema económico: ${req.body.economicSystem}`);
+            console.log(`💵 Moneda: ${req.body.currencyName}`);
+            console.log(`📈 Distribución de riqueza: ${req.body.wealthDistribution}`);
+            console.log(`🧓 Esperanza de vida: ${req.body.lifeExpectancy}`);
+            console.log(`👨‍👩‍👧‍👦 Crecimiento poblacional: ${req.body.populationGrowth}`);
+            
             nationString = await generateNationAdvancedGemini(
                 req.body.nationName,
                 req.body.governmentType,
@@ -88,17 +148,91 @@ const createNationGemini = async (req, res) => {
         } else {
             nationString = await generateNationGemini(req.body.nationName, req.body.governmentType, req.body.age);
         }
-        console.log(nationString)
+        
+        console.log(`✅ Generación de JSON completada`);
         const nationJSON = JSON.parse(nationString);
+        
+        console.log(`📝 Resumen de la nación generada:`);
+        console.log(`🏛️ Nombre: ${nationJSON.name}`);
+        console.log(`📜 Contexto histórico: ${nationJSON.historicalContext.substring(0, 50)}...`);
+        console.log(`🌐 Contexto geopolítico: ${nationJSON.geopoliticalContext.substring(0, 50)}...`);
+        console.log(`🗳️ Detalles políticos: ${Object.keys(nationJSON.politicsDetails).length} atributos`);
+        console.log(`💹 Detalles económicos: ${Object.keys(nationJSON.economyDetails).length} atributos`);
+        console.log(`👥 Detalles demográficos: ${Object.keys(nationJSON.populationDetails).length} atributos`);
+        
+        console.log(`🔍 Validando y corrigiendo datos antes de guardar...`);
+        
+        // 1. Corregir fechas en eventos
+        if (nationJSON.events && nationJSON.events.length > 0) {
+            console.log(`📅 Corrigiendo formato de fechas en ${nationJSON.events.length} eventos...`);
+            nationJSON.events = nationJSON.events.map(event => {
+                // Si la fecha tiene formato incorrecto (año negativo), la formateamos adecuadamente
+                if (event.date && event.date.match(/^-\d+/)) {
+                    const yearMatch = event.date.match(/^-(\d+)/);
+                    if (yearMatch) {
+                        const year = yearMatch[1];
+                        // Formato correcto para años anteriores a nuestra era: AñoBC
+                        event.date = `${year}BC-01-01`;
+                        console.log(`📅 Fecha corregida: de ${yearMatch[0]}-01-01 a ${event.date}`);
+                    }
+                }
+                return event;
+            });
+        }
+        
+        // 2. Asegurar campos requeridos en languages
+        if (nationJSON.populationDetails && nationJSON.populationDetails.languages) {
+            console.log(`🔤 Asegurando campos requeridos en ${nationJSON.populationDetails.languages.length} idiomas...`);
+            nationJSON.populationDetails.languages = nationJSON.populationDetails.languages.map(lang => {
+                if (!lang.status) {
+                    lang.status = lang.usage || "Oficial";
+                    console.log(`🔤 Agregado status a idioma ${lang.name || lang.languageName}: ${lang.status}`);
+                }
+                return lang;
+            });
+        }
+        
+        // 3. Asegurar campos requeridos en religions
+        if (nationJSON.populationDetails && nationJSON.populationDetails.religions) {
+            console.log(`⛪ Asegurando campos requeridos en ${nationJSON.populationDetails.religions.length} religiones...`);
+            nationJSON.populationDetails.religions = nationJSON.populationDetails.religions.map(religion => {
+                if (!religion.influence) {
+                    // Determinar influence en base al porcentaje si está disponible
+                    const percent = parseFloat(religion.percentage || religion.percentageAdherents || "0");
+                    if (percent > 50) {
+                        religion.influence = "Alta";
+                    } else if (percent > 20) {
+                        religion.influence = "Media";
+                    } else {
+                        religion.influence = "Baja";
+                    }
+                    console.log(`⛪ Agregado influence a religión ${religion.name || religion.religionName}: ${religion.influence}`);
+                }
+                return religion;
+            });
+        }
+        
+        // 4. Asegurar growthRate si no existe
+        if (nationJSON.populationDetails && !nationJSON.populationDetails.growthRate) {
+            nationJSON.populationDetails.growthRate = nationJSON.populationDetails.populationGrowthRate || "1.5%";
+            console.log(`👨‍👩‍👧‍👦 Agregado growthRate: ${nationJSON.populationDetails.growthRate}`);
+        }
+        
+        console.log(`💾 Guardando nación en la base de datos...`);
         const newNation = new Nation({
             ...nationJSON,
+            populationDetails: {
+                population: nationJSON.populationDetails,
+            },
             creator: req.body.userId,
         });
+        
         const savedNation = await newNation.save();
-        console.log(`🌏 Nacion generada: ${savedNation.name}`);
+        console.log(`✨ Nación guardada con éxito. ID: ${savedNation._id}`);
+        console.log(`🌏 Nación generada: ${savedNation.name}`);
         res.send({ msg: "Nation created successfully", nation: savedNation });
     } catch (error) {
-        console.log(error);
+        console.error(`❌ Error al crear nación:`, error);
         res.send(
             { msg: "Error creating nation" }
         );
@@ -107,21 +241,105 @@ const createNationGemini = async (req, res) => {
 
 const createRandomNation = async (req, res) => {
     try {
-        console.log(`🌏 Generando nacion...`)
+        console.log(`🌏 Iniciando generación aleatoria de nación...`);
+        console.log(`🎲 Generando parámetros aleatorios...`);
+        
+        console.log(`⏳ Solicitando generación aleatoria de nación...`);
         const nationString = await generateNationRandomGemini();
-        console.log(nationString)
+        console.log(`✅ Generación de JSON completada`);
+        
         const nationJSON = JSON.parse(nationString);
+        
+        console.log(`📝 Resumen de la nación aleatoria generada:`);
+        console.log(`🏛️ Nombre: ${nationJSON.name}`);
+        console.log(`🌐 Tipo de gobierno: ${nationJSON.politicsDetails.governmentType || 'No especificado'}`);
+        console.log(`📜 Contexto histórico: ${nationJSON.historicalContext.substring(0, 50)}...`);
+        console.log(`🌐 Contexto geopolítico: ${nationJSON.geopoliticalContext.substring(0, 50)}...`);
+        console.log(`🗳️ Detalles políticos: ${Object.keys(nationJSON.politicsDetails).length} atributos`);
+        console.log(`💹 Detalles económicos: ${Object.keys(nationJSON.economyDetails).length} atributos`);
+        console.log(`👥 Detalles demográficos: ${Object.keys(nationJSON.populationDetails).length} atributos`);
+        
+        console.log(`🔍 Validando y corrigiendo datos antes de guardar...`);
+        
+        // 1. Corregir fechas en eventos
+        if (nationJSON.events && nationJSON.events.length > 0) {
+            console.log(`📅 Corrigiendo formato de fechas en ${nationJSON.events.length} eventos...`);
+            nationJSON.events = nationJSON.events.map(event => {
+                // Si la fecha tiene formato incorrecto (año negativo), la formateamos adecuadamente
+                if (event.date && event.date.match(/^-\d+/)) {
+                    const yearMatch = event.date.match(/^-(\d+)/);
+                    if (yearMatch) {
+                        const year = yearMatch[1];
+                        // Formato correcto para años anteriores a nuestra era: AñoBC
+                        event.date = `${year}BC-01-01`;
+                        console.log(`📅 Fecha corregida: de ${yearMatch[0]}-01-01 a ${event.date}`);
+                    }
+                }
+                return event;
+            });
+        }
+        
+        // Adaptando la estructura de populationDetails para que coincida con el esquema
+        if (nationJSON.populationDetails && !nationJSON.populationDetails.population) {
+            console.log(`🔄 Adaptando estructura de populationDetails al esquema para nación aleatoria...`);
+            
+            // 2. Asegurar campos requeridos en languages
+            if (nationJSON.populationDetails.languages) {
+                console.log(`🔤 Asegurando campos requeridos en ${nationJSON.populationDetails.languages.length} idiomas...`);
+                nationJSON.populationDetails.languages = nationJSON.populationDetails.languages.map(lang => {
+                    if (!lang.status) {
+                        lang.status = lang.usage || "Oficial";
+                        console.log(`🔤 Agregado status a idioma ${lang.name || lang.languageName}: ${lang.status}`);
+                    }
+                    return lang;
+                });
+            }
+            
+            // 3. Asegurar campos requeridos en religions
+            if (nationJSON.populationDetails.religions) {
+                console.log(`⛪ Asegurando campos requeridos en ${nationJSON.populationDetails.religions.length} religiones...`);
+                nationJSON.populationDetails.religions = nationJSON.populationDetails.religions.map(religion => {
+                    if (!religion.influence) {
+                        // Determinar influence en base al porcentaje si está disponible
+                        const percent = parseFloat(religion.percentage || religion.percentageAdherents || "0");
+                        if (percent > 50) {
+                            religion.influence = "Alta";
+                        } else if (percent > 20) {
+                            religion.influence = "Media";
+                        } else {
+                            religion.influence = "Baja";
+                        }
+                        console.log(`⛪ Agregado influence a religión ${religion.name || religion.religionName}: ${religion.influence}`);
+                    }
+                    return religion;
+                });
+            }
+            
+            // 4. Asegurar growthRate si no existe
+            if (!nationJSON.populationDetails.growthRate) {
+                nationJSON.populationDetails.growthRate = nationJSON.populationDetails.populationGrowthRate || "1.5%";
+                console.log(`👨‍👩‍👧‍👦 Agregado growthRate: ${nationJSON.populationDetails.growthRate}`);
+            }
+            
+            nationJSON.populationDetails = {
+                population: nationJSON.populationDetails
+            };
+            console.log(`✅ Estructura adaptada correctamente`);
+        }
+        
+        console.log(`💾 Guardando nación aleatoria en la base de datos...`);
         const newNation = new Nation({
             ...nationJSON,
             creator: req.body.userId,
         });
         const savedNation = await newNation.save();
-        console.log(`🌏 Nacion generada: ${savedNation.name}`);
+        console.log(`✨ Nación aleatoria guardada con éxito. ID: ${savedNation._id}`);
+        console.log(`🌏 Nación aleatoria generada: ${savedNation.name}`);
         res.send({ msg: "Nation created successfully", nation: savedNation });
     } catch (error) {
-        console.log(error);
-        res.send(
-            { msg: "Error creating nation" }
+        console.error(`❌ Error al crear nación aleatoria:`, error);
+        res.status(500).send(
+            { msg: "Error creating random nation", error: error.message }
         );
     }
 }
@@ -251,10 +469,13 @@ export {
     getNationsUser,
     getNationsUserSimple,
     getNationDetails,
+    getMonthlyNation,
+    getNationCreator,
     //createNation,
     createNationGemini,
     createRandomNation,
     addEvent,
     deleteNation,
-    updateNation
+    updateNation,
+    generateImage
 }

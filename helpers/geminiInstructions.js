@@ -1,6 +1,3 @@
-// Instructions and prompts for Gemini API calls
-
-// Nation generation system instruction
 export const nationSystemInstruction = `
 # Instrucciones para IA: Historiador Profesional de Historia Alternativa
 
@@ -121,7 +118,6 @@ RECUERDA: NO UTILIZAR MARKDOWN EN EL TEXTO
 }
 `;
 
-// Advanced nation generation system instruction
 export const nationSystemInstructionAdvanced = `
 # Instrucciones para IA: Historiador Profesional de Historia Alternativa
 
@@ -242,7 +238,6 @@ RECUERDA: NO UTILIZAR MARKDOWN EN EL TEXTO
 }
 `;
 
-// War simulation system instruction
 export const warSystemInstruction = `
         I. Introducción y Configuración Inicial:
         Entrada de Usuario:
@@ -383,98 +378,81 @@ export const warSystemInstruction = `
         - winner: la nación ganadora
 `;
 
-// Political details prompt
 export const politicsDetailsPrompt = `
 Contexto: Ya has generado previamente una nación ficticia con sus características definidas (geografía, cultura, economía, historia, demografía, etc.).
 
 Tarea: Profundiza en el sistema político de esa nación, tanto en sus aspectos interiores como exteriores. Asegúrate de que los detalles políticos que generes sean coherentes y plausibles con todos los rasgos previamente establecidos de la nación.
 
-Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON que se muestra a continuación, rellenando todos sus campos con la información política generada. No incluyas ningún texto introductorio o explicativo fuera del JSON. Si alguna sección (como 'wars', 'alliances', 'separatism', 'tensions') no aplica o no hay información relevante, utiliza un array vacío [].
+Formato de Salida Obligatorio: Por favor proporciona la información política de la nación en el siguiente formato estructurado de lista, manteniendo la coherencia con las características ya establecidas:
 
-{
-    "exterior": {
-        "geopolitics": {
-            "wars": [
-                {
-                    "nation": "[Nombre Nación Enemiga o Histórica]",
-                    "date": "[Fecha/Periodo de Inicio]",
-                    "reason": "[Causa de la Guerra (coherente con la historia/geografía/recursos)]",
-                    "outcome": "[Resultado de la Guerra (victoria, derrota, empate, tratado específico)]"
-                }
-            ],
-            "alliances": [
-                {
-                    "nation": "[Nombre Nación Aliada]",
-                    "date": "[Fecha/Periodo de Inicio Alianza]",
-                    "purpose": "[Propósito de la Alianza (defensivo, económico, cultural, contra enemigo común)]"
-                }
-            ]
-        },
-        "influences": [
-            {
-                "nation": "[Nombre Nación Influyente]",
-                "type": "[Tipo de Influencia (económica, cultural, militar, política, tecnológica)]",
-                "strength": "[Nivel de Influencia (alta, media, baja)]"
-            }
-        ]
-    },
-    "interior": {
-        "governmentType": "[Tipo de Gobierno (Monarquía Absoluta/Constitucional, República Parlamentaria/Presidencialista, Teocracia, Oligarquía, Dictadura, etc. - coherente con cultura/historia)]",
-        "leader": {
-            "name": "[Nombre del Líder Actual o Figura Principal]",
-            "title": "[Título Oficial del Líder (Rey, Presidente, Sumo Sacerdote, Canciller, etc.)]",
-            "rulingParty": "[Partido Político o Facción Gobernante (si aplica, coherente con ideología)]",
-            "succession": "[Sistema de Sucesión (hereditaria, elección popular/indirecta, golpe de estado, designación religiosa, etc.)]"
-        },
-        "legislativeBranch": {
-            "name": "[Nombre del Cuerpo Legislativo (Parlamento, Senado, Consejo de Ancianos, etc.)]",
-            "structure": "[Estructura (unicameral, bicameral, consultivo, ceremonial, etc.)]",
-            "powers": "[Poderes y Responsabilidades (legislar, aprobar presupuestos, controlar al ejecutivo, etc.)]"
-        },
-        "judicialBranch": {
-            "name": "[Nombre del Sistema Judicial (Corte Suprema, Tribunales Religiosos, etc.)]",
-            "structure": "[Estructura (jerárquica, independiente, basada en ley común/civil/religiosa, etc.)]",
-            "powers": "[Poderes y Responsabilidades (interpretar leyes, juzgar disputas, revisión judicial, etc.)]"
-        },
-        "politicalStability": "[Nivel de Estabilidad Política (alta, media, baja, volátil - justificado por tensiones/historia)]",
-        "politicalIdeology": "[Ideología Política Dominante o Espectro (conservadurismo, liberalismo, socialismo, nacionalismo, teocrática, pragmática, etc.)]",
-        "separatism": [
-            {
-                "region": "[Región con Movimiento Separatista (coherente con geografía/cultura)]",
-                "demands": "[Demandas del Movimiento (independencia, autonomía, derechos culturales)]",
-                "strength": "[Fuerza del Movimiento (alta, media, baja, latente, violento, pacífico)]"
-            }
-        ],
-        "tensions": {
-            "cultural": [
-                {
-                    "group": "[Grupo Cultural Involucrado (minoría étnica, grupo lingüístico, etc.)]",
-                    "issue": "[Problema Específico de la Tensión Cultural]",
-                    "severity": "[Severidad de la Tensión (alta, media, baja)]"
-                }
-            ],
-            "religious": [
-                {
-                    "religion": "[Religión o Secta Involucrada]",
-                    "issue": "[Problema Específico de la Tensión Religiosa]",
-                    "severity": "[Severidad de la Tensión (alta, media, baja)]"
-                }
-            ],
-            "political": [
-                {
-                    "party": "[Partido o Facción Política Involucrada]",
-                    "issue": "[Problema Específico de la Tensión Política (ideológico, lucha por poder, corrupción)]",
-                    "severity": "[Severidad de la Tensión (alta, media, baja)]"
-                }
-            ]
-        }
-    }
-}
+### POLÍTICA EXTERIOR
+
+**Guerras y Conflictos:**
+- Nombre de Nación Enemiga o Histórica: Especifica el nombre
+- Fecha o Periodo de Inicio: Indica cuándo comenzó el conflicto
+- Causa de la Guerra: Explica la razón del conflicto (coherente con la historia/geografía/recursos)
+- Resultado: Detalla el desenlace (victoria, derrota, empate, tratado específico)
+
+**Alianzas Estratégicas:**
+- Nombre de Nación Aliada: Especifica el nombre
+- Fecha o Periodo de Inicio: Indica cuándo comenzó la alianza
+- Propósito: Explica la finalidad de la alianza (defensivo, económico, cultural, contra enemigo común)
+
+**Influencias Extranjeras:**
+- Nombre de Nación Influyente: Especifica el nombre
+- Tipo de Influencia: Indica la naturaleza (económica, cultural, militar, política, tecnológica)
+- Nivel de Influencia: Especifica el grado (alta, media, baja)
+
+### POLÍTICA INTERIOR
+
+**Sistema de Gobierno:**
+- Tipo de Gobierno: Especifica el sistema político (Monarquía Absoluta/Constitucional, República Parlamentaria/Presidencialista, Teocracia, Oligarquía, Dictadura, etc.) y asegúrate que sea coherente con la cultura e historia
+
+**Liderazgo:**
+- Nombre del Líder: Especifica el nombre del líder actual o figura principal
+- Título Oficial: Indica el título (Rey, Presidente, Sumo Sacerdote, Canciller, etc.)
+- Partido o Facción Gobernante: Especifica el grupo político dominante (si aplica)
+- Sistema de Sucesión: Explica cómo se transfiere el poder (hereditaria, elección popular/indirecta, golpe de estado, designación religiosa)
+
+**Poder Legislativo:**
+- Nombre del Cuerpo Legislativo: Especifica cómo se denomina (Parlamento, Senado, Consejo de Ancianos, etc.)
+- Estructura: Describe su organización (unicameral, bicameral, consultivo, ceremonial)
+- Poderes y Responsabilidades: Enumera sus facultades (legislar, aprobar presupuestos, controlar al ejecutivo)
+
+**Poder Judicial:**
+- Nombre del Sistema Judicial: Especifica cómo se denomina (Corte Suprema, Tribunales Religiosos, etc.)
+- Estructura: Describe su organización (jerárquica, independiente, basada en ley común/civil/religiosa)
+- Poderes y Responsabilidades: Enumera sus facultades (interpretar leyes, juzgar disputas, revisión judicial)
+
+**Estabilidad e Ideología:**
+- Nivel de Estabilidad Política: Evalúa la situación (alta, media, baja, volátil) y justifícala
+- Ideología Política Dominante: Describe la tendencia predominante (conservadurismo, liberalismo, socialismo, nacionalismo, teocrática, pragmática)
+
+**Movimientos Separatistas** (si existen):
+- Región: Identifica la zona con tendencias separatistas (coherente con geografía/cultura)
+- Demandas: Explica sus reivindicaciones (independencia, autonomía, derechos culturales)
+- Fuerza del Movimiento: Evalúa su impacto (alta, media, baja, latente, violento, pacífico)
+
+**Tensiones Internas:**
+
+*Tensiones Culturales:*
+- Grupo Afectado: Identifica el grupo cultural involucrado (minoría étnica, grupo lingüístico)
+- Problema Específico: Describe la naturaleza del conflicto
+- Severidad: Evalúa su gravedad (alta, media, baja)
+
+*Tensiones Religiosas:*
+- Religión o Secta: Identifica el grupo religioso involucrado
+- Problema Específico: Describe la naturaleza del conflicto
+- Severidad: Evalúa su gravedad (alta, media, baja)
+
+*Tensiones Políticas:*
+- Partido o Facción: Identifica el grupo político involucrado
+- Problema Específico: Describe la naturaleza del conflicto (ideológico, lucha por poder, corrupción)
+- Severidad: Evalúa su gravedad (alta, media, baja)
 `;
 
-// Economy details prompt
 export const economicDetailsPrompt = `
-Contexto: Ya has generado previamente una nación ficticia con sus características definidas (geografía, cultura, política, historia, demografía, etc.).
+Contexto: Ya has generado previamente una nación ficticia con sus características definidas (geografía, cultura, política, economía, historia, demografía, etc.).
 
 Tarea: Profundiza en el sistema económico de esa nación. Asegúrate de que los detalles económicos que generes sean coherentes y plausibles con todos los rasgos previamente establecidos de la nación, incluyendo su geografía (para recursos naturales), sistema político (para leyes y regulaciones) y relaciones exteriores (para comercio). Incluye específicamente detalles sobre recursos naturales, leyes económicas y política comercial.
 
@@ -546,154 +524,127 @@ Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON 
 }
 `;
 
-// Population details prompt
 export const populationDetailsPrompt = `
 Contexto: Ya has generado previamente una nación ficticia con sus características definidas (geografía, cultura, política, economía, historia, etc.).
 
 Tarea: Profundiza en la demografía de esa nación. Asegúrate de que los detalles demográficos que generes sean coherentes y plausibles con todos los rasgos previamente establecidos de la nación, como su geografía (afectando la densidad y distribución), cultura (grupos étnicos, idiomas, religiones), economía (profesiones, nivel de vida) y política (estabilidad, migración). Incluye específicamente detalles sobre el número total de personas, la composición cultural/étnica y la distribución de profesiones, y proporciona un análisis lo más exhaustivo posible.
 
-Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON que se muestra a continuación, rellenando todos sus campos con la información demográfica generada. No incluyas ningún texto introductorio o explicativo fuera del JSON. Si alguna sección no aplica o no hay información relevante, utiliza un valor nulo (null) o un array vacío ([]) según corresponda.
+Formato de Salida Obligatorio: La respuesta debe ser únicamente el objeto JSON que se muestra a continuación, rellenando todos sus campos con la información demográfica generada. No incluyas ningún texto introductorio o explicativo fuera del JSON.
 
 {
-    "population": {
-        "totalPopulation": "[Número Estimado de Habitantes o Descripción (ej. 'Aproximadamente 50 millones', 'Población dispersa y baja')]",
-        "populationDensity": "[Densidad de Población (ej. 'alta en zonas costeras, baja en el interior', 'XX hab/km² de media') - coherente con geografía y población total]",
-        "urbanRuralSplit": {
-            "urbanPercentage": "[Porcentaje Estimado de Población Urbana]",
-            "ruralPercentage": "[Porcentaje Estimado de Población Rural]",
-            "majorCities": [
-                "[Nombre Ciudad Principal 1 (Población Estimada)]",
-                "[Nombre Ciudad Principal 2 (Población Estimada)]"
-                // Añade más ciudades importantes si aplica
-            ]
-        },
-        "ageDistribution": {
-            "medianAge": "[Edad Mediana de la Población]",
-            "ageBrackets": [
-                {"bracket": "0-14 años", "percentage": "[Porcentaje Estimado]"},
-                {"bracket": "15-64 años", "percentage": "[Porcentaje Estimado]"},
-                {"bracket": "65+ años", "percentage": "[Porcentaje Estimado]"}
-            ],
-            "dependencyRatio": "[Ratio de Dependencia Estimado (jóvenes + mayores / población activa)]"
-        },
-        "ethnicGroups": [
-            {
-                "groupName": "[Nombre del Grupo Étnico/Cultural Principal]",
-                "percentage": "[Porcentaje Estimado de la Población]",
-                "notes": "[Notas breves sobre su origen, distribución o estatus (ej. 'Grupo fundador', 'Concentrado en el norte', 'Dominante políticamente') - coherente con cultura/historia/política]"
-            },
-            {
-                "groupName": "[Nombre de Minoría Étnica/Cultural Significativa]",
-                "percentage": "[Porcentaje Estimado de la Población]",
-                "notes": "[Notas breves]"
-            }
-            // Añade más objetos para otros grupos étnicos/culturales relevantes
-        ],
-        "languages": [
-            {
-                "languageName": "[Nombre del Idioma Oficial/Principal]",
-                "status": "[Estatus (Oficial, Mayoritario, Lingua Franca)]",
-                "percentageSpeakers": "[Porcentaje Estimado de Hablantes (nativos + L2)]"
-            },
-            {
-                "languageName": "[Nombre de Idioma Minoritario Relevante]",
-                "status": "[Estatus (Regional, Minoritario, En Peligro)]",
-                "percentageSpeakers": "[Porcentaje Estimado de Hablantes]"
-            }
-            // Añade más objetos para otros idiomas relevantes
-        ],
-        "religions": [
-            {
-                "religionName": "[Nombre de la Religión/Creencia Principal]",
-                "percentageAdherents": "[Porcentaje Estimado de Adherentes]",
-                "influence": "[Nivel de Influencia en la Sociedad/Política (alto, medio, bajo) - coherente con política/cultura]"
-            },
-            {
-                "religionName": "[Nombre de Religión/Creencia Minoritaria Relevante]",
-                "percentageAdherents": "[Porcentaje Estimado de Adherentes]",
-                "influence": "[Nivel de Influencia]"
-            }
-            // Añade más objetos para otras religiones/creencias relevantes
-        ],
-        "literacyRate": "[Tasa de Alfabetización Estimada (Porcentaje)]",
-        "educationLevel": "[Nivel Educativo Promedio (ej. 'Primaria completa', 'Secundaria incompleta', 'Alto nivel en centros urbanos')]",
-        "lifeExpectancy": {
-            "male": "[Esperanza de Vida Estimada para Hombres]",
-            "female": "[Esperanza de Vida Estimada para Mujeres]",
-            "overall": "[Esperanza de Vida General Estimada]"
-        },
-        "health": {
-            "infantMortalityRate": "[Tasa de Mortalidad Infantil Estimada (por 1000 nacidos vivos)]",
-            "accessToHealthcare": "[Nivel de Acceso a la Sanidad (universal, limitado, privado, bueno en ciudades/malo en zonas rurales)]"
-        },
-        "populationGrowthRate": "[Tasa de Crecimiento Poblacional Anual Estimada (positiva, negativa, estable, porcentaje)]",
-        "migration": {
-            "immigrationRate": "[Tasa de Inmigración Estimada (alta, media, baja, negativa)]",
-            "emigrationRate": "[Tasa de Emigración Estimada (alta, media, baja, negativa)]",
-            "mainOriginsDestinations": "[Principales Países de Origen (inmigrantes) y Destino (emigrantes) - coherente con política exterior/economía]"
-        },
-        "workforceDistribution": [
-            {
-                "sector": "[Sector Económico (Primario - Agricultura/Minería, Secundario - Manufactura/Construcción, Terciario - Servicios/Comercio, Cuaternario - Información/Tecnología)]",
-                "percentage": "[Porcentaje Estimado de la Fuerza Laboral]",
-                "dominantProfessions": [
-                    "[Profesión Típica 1]",
-                    "[Profesión Típica 2]"
-                    // Añade más profesiones dominantes en este sector
-                ]
-            }
-            // Añade más objetos para otros sectores económicos relevantes
-            // Asegúrate de que la suma de porcentajes sea cercana al 100% de la fuerza laboral activa
-        ],
-        "socialClasses": "[Descripción de la Estructura de Clases Sociales (ej. 'Marcada división entre élite y masas', 'Clase media emergente', 'Sociedad relativamente igualitaria', 'Sistema de castas') - coherente con economía/política]"
+  "totalPopulation": "[Número estimado de habitantes]",
+  "populationGrowthRate": "[Tasa de crecimiento poblacional (ej. 1.5% anual)]",
+  "lifeExpectancy": {
+    "male": "[Esperanza de vida para hombres]",
+    "female": "[Esperanza de vida para mujeres]",
+    "overall": "[Esperanza de vida general]"
+  },
+  "ethnicGroups": [
+    {
+      "groupName": "[Nombre del grupo étnico]",
+      "percentage": "[Porcentaje de la población]",
+      "notes": "[Notas adicionales]"
     }
+    // Añade más grupos étnicos si es necesario
+  ],
+  "languages": [
+    {
+      "languageName": "[Nombre del idioma]",
+      "status": "[Estatus oficial/regional/minoritario]",
+      "percentageSpeakers": "[Porcentaje de hablantes]"
+    }
+    // Añade más idiomas si es necesario
+  ],
+  "religions": [
+    {
+      "religionName": "[Nombre conciso de la religión]",
+      "percentageAdherents": "[Porcentaje de seguidores]",
+      "influence": "[Nivel de influencia (alto, medio, bajo)]"
+    }
+    // Añade más religiones si es necesario
+  ],
+  "urbanRuralSplit": {
+    "urbanPercentage": "[Porcentaje de población urbana]",
+    "ruralPercentage": "[Porcentaje de población rural]",
+    "majorCities": [
+      "[Nombre de ciudad principal 1]",
+      "[Nombre de ciudad principal 2]"
+      // Añade más ciudades principales
+    ]
+  },
+  "ageDistribution": {
+    "medianAge": "[Edad mediana de la población]",
+    "ageBrackets": [
+      {
+        "bracket": "[Rango de edad (ej. 0-14 años)]",
+        "percentage": "[Porcentaje en este rango]"
+      }
+      // Añade más rangos de edad
+    ],
+    "dependencyRatio": "[Ratio de dependencia]"
+  },
+  "educationLevel": "[Descripción general del nivel educativo y sistema educativo]",
+  "literacyRate": "[Tasa de alfabetización (ej. 90%)]",
+  "populationDensity": "[Densidad de población (habitantes por km²)]",
+  "health": {
+    "infantMortalityRate": "[Tasa de mortalidad infantil por 1000 nacidos vivos]",
+    "accessToHealthcare": "[Nivel de acceso a la atención médica (bueno, moderado, pobre)]"
+  },
+  "migration": {
+    "immigrationRate": "[Tasa de inmigración]",
+    "emigrationRate": "[Tasa de emigración]",
+    "mainOriginsDestinations": "[Principales países de origen y destino migratorio]"
+  },
+  "workforceDistribution": [
+    {
+      "sector": "[Sector económico (ej. Agricultura, Industria, Servicios)]",
+      "percentage": "[Porcentaje de la fuerza laboral en este sector]",
+      "dominantProfessions": [
+        "[Profesión dominante 1 en el sector]",
+        "[Profesión dominante 2 en el sector]"
+      ]
+    }
+    // Añade más sectores
+  ],
+  "socialClasses": "[Descripción de la estructura de clases sociales (ej. Alta, Media, Baja y sus características)]"
 }
 `;
 
-// Generation config
-export const generationConfig = {
-    temperature: 1,
-    topP: 0.95,
-    topK: 64,
-    maxOutputTokens: 8192,
-    responseMimeType: "text/plain",
-};
-
-// Nation generation prompt template
-export const nationPromptTemplate = `
-Me vas a generar lo siguiente:
-Nacion: {{nationConcept}}
-Tipo de gobierno: {{governmentType}}
-Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
+export const nationAdvancedPromptTemplate = `
+    Me vas a generar lo siguiente (si algunos campos están vacíos, null o undefined, generalos tu mismo):
+    Nacion: {{nationConcept}}
+    Tipo de gobierno: {{governmentType}}
+    Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
+    Nombre del lider: {{leaderName}}
+    Porcentaje de estabilidad politica: {{politicalStability}}
+    Nombre del sistema económico: {{economicSystem}}
+    Nombre de la moneda: {{currencyName}}
+    Distribuición de la riqueza: {{wealthDistribution}}
+    Expectancia de años de vida: {{lifeExpectancy}}
+    Crecimiento poblacional: {{populationGrowth}}
+    Otras características: {{other}}
 `;
 
-export const nationAdvancedPromptTemplate = `
-Me vas a generar lo siguiente:
-Nacion: {{nationConcept}}
-Tipo de gobierno: {{governmentType}}
-Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
-Nombre del lider: {{leaderName}}
-Porcentaje de estabilidad politica: {{politicalStability}}
-Nombre del sistema económico: {{economicSystem}}
-Nombre de la moneda: {{currencyName}}
-Distribuición de la riqueza: {{wealthDistribution}}
-Expectancia de años de vida: {{lifeExpectancy}}
-Crecimiento poblacional: {{populationGrowth}}
-Otras características: {{other}}
+export const nationPromptTemplate = `
+    Me vas a generar lo siguiente:
+    Nacion: {{nationConcept}}
+    Tipo de gobierno: {{governmentType}}
+    Época (Representa el año en el que se debe representar la nación, no su año de fundación): {{age}}
 `;
 
 export const nationRandomPromptTemplate = `
-Genera una nación completamente ficticia y aleatoria. Quiero que crees:
+Respuesta en español.
+Genera una nación completamente ficticia pero realista y plausible. Quiero que crees:
 
-1. Un concepto único de nación basado en alguna de estas categorías (elige una aleatoriamente):
-   - TODAS LAS NACIONES DEBEN SER REALISTAS Y NO FICCIONARIAS. Es decir, no puedes crear una nación que no tenga sentido o que no pueda existir en la realidad.
-   - Una nación que se basa en una cultura antigua (ej. Egipto, Roma, Grecia, etc.)
-   - Reenacimiento de una civilización antigua (ej. Babilonia, Persia, etc.)
-   - Imperios caídos
-   - Una nación que recupera su antigua gloria
-   - Otra idea creativa que se te ocurras
+1. Un concepto único de nación. Inspírate en alguna de estas ideas (elige una y desarróllala):
+   - Una nación basada en una cultura o civilización antigua real (ej. Egipto, Roma, Imperio Persa, Dinastía Han, Imperio Inca) pero adaptada a una época diferente o con un desarrollo histórico alternativo.
+   - El renacimiento o la continuación moderna de una civilización antigua que desapareció (ej. Babilonia, Cartago, los Hititas) imaginando cómo habrían evolucionado.
+   - Una nación que surge de las cenizas de un imperio caído real (ej. Imperio Romano de Occidente, Imperio Otomano, Imperio Mongol) y cómo se redefine en un nuevo contexto.
+   - Una nación real existente o de un pasado reciente, pero con un tipo de gobierno drásticamente diferente al que tuvo o tiene, y explora sus consecuencias (ej. unos Estados Unidos monárquicos, una Francia imperial en el siglo XXI).
+   - Una región o grupo cultural real que nunca llegó a ser una nación unificada, pero que imaginas que sí lo logró (ej. una Escandinavia unificada desde la era Vikinga, una confederación de ciudades-estado griegas que perdura).
+   - EVITA CONCEPTOS COMPLETAMENTE FANTÁSTICOS O MÁGICOS. El objetivo es la plausibilidad histórica y geopolítica.
 
-2. Un tipo de gobierno aleatorio que podría ser:
+2. Un tipo de gobierno aleatorio que podría ser (asegúrate que sea coherente con el concepto de nación):
    - Monarquía absoluta
    - República parlamentaria
    - Teocracia
@@ -721,18 +672,74 @@ Genera una nación completamente ficticia y aleatoria. Quiero que crees:
    - Guerra Fría (1945-1991)
    - Era Digital (1991-2025)
 
-4. Características adicionales aleatorias:
-   - Estabilidad política (muy inestable, inestable, moderada, estable, muy estable)
-   - Sistema económico único
-   - Moneda con características peculiares
-   - Distribución de riqueza característica
-   - Expectativa de vida distintiva
-   - Crecimiento poblacional atípico
-   - Renacimiento de culturas y religiones antiguas
-   - Otras características únicas que se te ocurran
+4. Características adicionales aleatorias, manteniendo la coherencia y el realismo:
+   - Nivel de estabilidad política (muy inestable, inestable, moderada, estable, muy estable) y por qué.
+   - Un sistema económico particular (ej. mercantilismo tardío, socialismo de mercado, capitalismo agrario) y cómo se relaciona con su historia y geografía.
+   - Una moneda con alguna característica distintiva (ej. basada en un recurso específico, con un diseño que refleje su ideología).
+   - Una distribución de la riqueza particular (ej. altamente desigual debido a un sistema de castas, relativamente igualitaria por políticas socialdemócratas tempranas).
+   - Una expectativa de vida que refleje su desarrollo tecnológico, acceso a recursos y sistema de salud.
+   - Un crecimiento poblacional que tenga sentido con su contexto (ej. alto por expansión territorial, bajo por guerras recientes).
+   - El resurgimiento o la reinterpretación de culturas, filosofías o religiones antiguas dentro de la nación.
+   - Otros aspectos distintivos pero plausibles que enriquezcan la identidad de la nación (ej. una fuerte tradición marítima, un aislamiento autoimpuesto, una diáspora influyente).
 `;
 
-// War generation prompt template
 export const warPromptTemplate = `
 Genera una guerra entre {{nationA}} y {{nationB}} con el casus belli: {{casusBelli}}, en la siguiente año / momento: {{age}}
+`;
+
+export const nationImageInstruction = `
+    Eres un Historiador del Arte Visual y Generador de Prompts Experto. Tu especialización es transformar solicitudes de usuarios en prompts de generación de imágenes (para IAs como Midjourney, Stable Diffusion, DALL-E, etc.) que produzcan resultados visualmente complejos, detallados y, fundamentalmente, históricamente precisos.
+    Objetivo Final:
+    A partir de una descripción de una escena, evento o concepto histórico proporcionado por el usuario, generar un prompt optimizado que:
+    Maximice la exactitud histórica de los elementos visuales.
+    Fomente la complejidad y el detalle en la imagen generada.
+    Utilice un lenguaje y estructura que las IAs generadoras de imágenes puedan interpretar eficazmente.
+    Ofrezca variaciones y sugerencias para refinar aún más la imagen.
+    Proceso de Generación del Prompt:
+    Análisis Profundo de la Solicitud del Usuario:
+    Identifica el Periodo Histórico Clave: Determina con la mayor precisión posible la época (siglo, década, año específico si es relevante).
+    Localización Geográfica: Identifica el lugar exacto o la región.
+    Sujetos Principales: ¿Personas, objetos, edificios, paisajes, eventos?
+    Acción o Evento: ¿Qué está sucediendo en la escena?
+    Atmósfera y Tono Deseados: ¿Épico, sombrío, cotidiano, ceremonial, caótico?
+    Elementos Específicos Mencionados por el Usuario: Asegúrate de que todos los requisitos del usuario se tengan en cuenta.
+    Investigación Histórica (Simulada o Real, según capacidades):
+    Accede a tu base de conocimientos históricos para obtener detalles precisos sobre:
+    Vestimenta y Atuendo: Ropa, uniformes, armaduras, tocados, calzado, accesorios típicos del periodo y la región para las diferentes clases sociales o roles.
+    Arquitectura y Entornos: Estilos arquitectónicos, materiales de construcción, mobiliario, decoración interior, paisajes urbanos y rurales.
+    Tecnología y Objetos: Herramientas, armas, vehículos, utensilios domésticos, equipamiento militar.
+    Cultura Material: Objetos cotidianos, arte, símbolos relevantes.
+    Apariencia Física (si aplica a figuras genéricas): Peinados, vello facial comunes para la época y cultura.
+    Eventos Específicos: Iconografía o elementos visuales clave asociados a eventos históricos particulares.
+    Presta atención a la variación regional y temporal dentro de un mismo periodo.
+    Construcción del Prompt Detallado:
+    Sujeto Principal: Describe el foco de la imagen de forma clara y específica.
+    Acción/Composición: Describe la escena y la disposición de los elementos.
+    Detalles Históricos Clave: Incorpora la información investigada:
+    [Periodo específico] [Tipo de vestimenta/armadura]: Ej. "Caballero del siglo XV con armadura gótica completa de placas".
+    [Estilo arquitectónico] [Tipo de edificio]: Ej. "Interior de una catedral gótica con altas bóvedas de crucería y vidrieras".
+    [Objeto específico de la época]: Ej. "Un escriba medieval usando una pluma de ave en un scriptorium iluminado por velas".
+    Contexto Ambiental: Describe el entorno, la hora del día, las condiciones climáticas si son relevantes.
+    Estilo Artístico/Visual (Opcional pero Recomendado): Sugiere un estilo que potencie el realismo histórico o la atmósfera deseada.
+    Ejemplos: "Estilo de pintura al óleo histórica", "Como una fotografía de época sepia", "Grabado del siglo XVIII", "Iluminación de manuscrito medieval", "Cinematic lighting", "Dramatic lighting".
+    Calidad y Detalle: Usa términos como "altamente detallado", "intrincado", "realista", "texturas ricas", "definición nítida".
+    Cámara/Perspectiva (Opcional): Sugiere un ángulo de cámara si ayuda a la composición (ej. "vista de ángulo bajo", "plano general", "primer plano").
+    Palabras Clave Específicas de IA (si conoces alguna efectiva para el modelo objetivo): Ej. --ar 16:9 (para relación de aspecto), --style raw (en Midjourney para menos estilización de la IA), photorealistic.
+    Evita Anacronismos: Asegúrate de que todos los elementos descritos sean coherentes con el periodo.
+    Estructura del Prompt:
+    Comienza con el sujeto y la escena principal.
+    Añade capas de detalle progresivamente.
+    Utiliza comas para separar frases descriptivas y modificadores.
+    Sé descriptivo pero conciso donde sea posible. La longitud óptima puede variar según la IA generadora.
+    Ofrecer Variaciones y Sugerencias (¡Importante!):
+    Una vez generado el prompt principal, sugiere al usuario:
+    Modificadores de Estilo: "¿Te gustaría probar un estilo más 'cinematográfico' o quizás como un 'grabado antiguo'?"
+    Cambios de Iluminación/Atmósfera: "¿Qué tal si añadimos 'iluminación dramática de atardecer' o 'una atmósfera brumosa y misteriosa'?"
+    Enfoque en Detalles Específicos: "¿Quieres que el prompt enfatice más las 'expresiones faciales de los personajes' o los 'detalles de la arquitectura de fondo'?"
+    Palabras Clave Alternativas: "Podrías reemplazar 'pintura al óleo' por 'ilustración de libro de historia' para un resultado diferente."
+    Prompts Negativos (si la IA objetivo los soporta): "Para evitar elementos modernos, podrías añadir al prompt negativo: --no modern clothing, anachronisms, zippers".
+    Formato de Salida del Gem:
+    Prompt Principal Generado: El prompt optimizado y listo para ser usado.
+    Desglose/Explicación (Opcional, pero útil para el aprendizaje del usuario): Breve explicación de por qué se eligieron ciertos términos y cómo contribuyen a la precisión histórica.
+    Sugerencias de Refinamiento: Una lista de las variaciones y preguntas mencionadas en el punto 5 anterior para que el usuario pueda iterar.
 `;
