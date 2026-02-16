@@ -1,300 +1,1158 @@
-import OpenAI from "openai";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import {
   nationSystemInstruction,
-  nationSystemInstructionAdvanced,
   warSystemInstruction,
-  politicsDetailsPrompt,
-  economicDetailsPrompt,
-  populationDetailsPrompt,
-  nationPromptTemplate,
-  nationAdvancedPromptTemplate,
-  nationRandomPromptTemplate,
-  warPromptTemplate,
 } from "../helpers/geminiInstructions.js";
-import {
-  nationSchema,
-  warSchema,
-  politicsSchema,
-  economySchema,
-  populationSchema,
-} from "../helpers/jsonSchemas.js";
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenAI({ apiKey });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const geminiModel = "gemini-2.5-flash";
 
-const geminiModel = "gemini-3-flash-preview";
-const gptImageModel = "gpt-image-1";
+const warSchema = {
+  type: Type.OBJECT,
+  properties: {
+    name: {
+      type: Type.STRING,
+      description:
+        "Nombre histórico coherente (ej. 2ª Guerra de Secesión, Operación Alhambra)",
+    },
+    year: { type: Type.NUMBER },
+    casusBelli: { type: Type.STRING },
 
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "application/json",
+    // FASE II: INVESTIGACIÓN - AGRESOR
+    aggressorCountry: {
+      type: Type.OBJECT,
+      properties: {
+        name: { type: Type.STRING },
+        totalTroops: {
+          type: Type.NUMBER,
+          description:
+            "Número total de efectivos movilizados (personal activo y reserva)",
+        },
+        militaryStructure: {
+          type: Type.STRING,
+          description:
+            "Organización de las fuerzas, doctrina militar y principales proveedores",
+        },
+        budget: {
+          type: Type.STRING,
+          description: "Presupuesto de defensa en USD y porcentaje del PIB",
+        },
+        inventory: {
+          type: Type.OBJECT,
+          properties: {
+            army: {
+              type: Type.STRING,
+              description:
+                "Modelos y cantidades de tanques, blindados y artillería",
+            },
+            navy: {
+              type: Type.STRING,
+              description: "Buques, submarinos y capacidades de patrulla",
+            },
+            airForce: {
+              type: Type.STRING,
+              description:
+                "Cazas, bombarderos, helicópteros y drones de combate",
+            },
+            specialCapacities: {
+              type: Type.STRING,
+              description:
+                "Cibernética, satélites y armamento nuclear/estratégico",
+            },
+          },
+          required: ["army", "navy", "airForce"],
+        },
+        geography: {
+          type: Type.STRING,
+          description:
+            "Fronteras, terreno (montañas, ríos) e infraestructura clave",
+        },
+        economy: {
+          type: Type.STRING,
+          description:
+            "PIB, industrias principales y dependencia de importaciones (energía/comida)",
+        },
+        moralAndSupport: {
+          type: Type.NUMBER,
+          description:
+            "Nivel de moral de las tropas y apoyo popular a la guerra (0-100)",
+        },
+      },
+      required: [
+        "name",
+        "totalTroops",
+        "militaryStructure",
+        "inventory",
+        "geography",
+        "economy",
+      ],
+    },
+
+    // FASE II: INVESTIGACIÓN - DEFENSOR (Espejo del agresor)
+    defenderCountry: {
+      type: Type.OBJECT,
+      properties: {
+        name: { type: Type.STRING },
+        totalTroops: { type: Type.NUMBER },
+        militaryStructure: { type: Type.STRING },
+        budget: { type: Type.STRING },
+        inventory: {
+          type: Type.OBJECT,
+          properties: {
+            army: { type: Type.STRING },
+            navy: { type: Type.STRING },
+            airForce: { type: Type.STRING },
+            specialCapacities: { type: Type.STRING },
+          },
+          required: ["army", "navy", "airForce"],
+        },
+        geography: { type: Type.STRING },
+        economy: { type: Type.STRING },
+        moralAndSupport: { type: Type.NUMBER },
+      },
+      required: [
+        "name",
+        "totalTroops",
+        "militaryStructure",
+        "inventory",
+        "geography",
+        "economy",
+      ],
+    },
+
+    // FASE III Y IV: DESARROLLO Y EJECUCIÓN
+    warProgress: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          phase: {
+            type: Type.STRING,
+            description:
+              "Nombre de la fase (ej: Ofensiva inicial, Desgaste en el frente)",
+          },
+          chronology: {
+            type: Type.STRING,
+            description:
+              "Descripción detallada de los eventos clave día a día o semana a semana",
+          },
+          importantBattles: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                location: {
+                  type: Type.STRING,
+                  description: "Ubicación geográfica exacta o estratégica",
+                },
+                forcesInvolved: {
+                  type: Type.STRING,
+                  description: "Unidades específicas y cantidad de equipo",
+                },
+                tactics: {
+                  type: Type.STRING,
+                  description:
+                    "Análisis profundo de maniobras, tecnologías usadas y doctrina aplicada",
+                },
+                outcome: {
+                  type: Type.STRING,
+                  description: "Resultado estratégico de la batalla",
+                },
+                casualties: {
+                  type: Type.STRING,
+                  description:
+                    "Estimación de bajas y equipo perdido en este encuentro",
+                },
+              },
+              required: ["location", "forcesInvolved", "tactics", "outcome"],
+            },
+          },
+          nonMilitaryEvents: {
+            type: Type.STRING,
+            description:
+              "Sanciones, crisis de refugiados, ciberataques a civiles y reacciones diplomáticas",
+          },
+        },
+        required: ["phase", "chronology", "importantBattles"],
+      },
+    },
+
+    // FASE IV: COMPONENTE HUMANO (Diario del soldado)
+    soldierDiary: {
+      type: Type.OBJECT,
+      properties: {
+        character: {
+          type: Type.STRING,
+          description: "Nombre, rango, unidad y motivaciones del soldado",
+        },
+        entries: {
+          type: Type.STRING,
+          description:
+            "Relato crudo y dramático en 1ª persona (mínimo 500 palabras). Enfocado en el horror del frente.",
+        },
+      },
+      required: ["character", "entries"],
+    },
+
+    // FASE V: CONCLUSIÓN Y RESULTADOS
+    results: {
+      type: Type.STRING,
+      description:
+        "Consecuencias territoriales, económicas y políticas a largo plazo",
+    },
+    kiaTotal: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          country: { type: Type.STRING },
+          militaryLosses: {
+            type: Type.NUMBER,
+            description: "Bajas totales de soldados",
+          },
+          civilianLosses: {
+            type: Type.NUMBER,
+            description: "Bajas totales de civiles",
+          },
+        },
+        required: ["country", "militaryLosses", "civilianLosses"],
+      },
+    },
+    winner: {
+      type: Type.STRING,
+      description: "Nación ganadora o descripción de un tratado de paz/empate",
+    },
+  },
+  required: [
+    "name",
+    "year",
+    "casusBelli",
+    "aggressorCountry",
+    "defenderCountry",
+    "warProgress",
+    "soldierDiary",
+    "results",
+    "kiaTotal",
+    "winner",
+  ],
 };
 
-// Esta función la mantenemos para casos en los que no usemos structured output
-function cleanJsonResponse(text) {
-  console.log("🧹 Limpiando respuesta JSON...");
-  // Eliminar bloques de código markdown
-  let cleaned = text.replace(/```(json)?|```/g, "");
-  cleaned = cleaned.trim();
+const nationSchema = {
+  description: "Esquema completo para la generación de una nación detallada",
+  type: "object",
+  properties: {
+    name: {
+      type: "string",
+      description: "El nombre oficial de la nación.",
+    },
+    historicalContext: {
+      type: "string",
+      description: "Resumen de la historia y origen de la nación.",
+    },
+    historicalCuriosities: {
+      type: "array",
+      items: { type: "string" },
+      description: "Lista de datos curiosos o hechos poco conocidos.",
+    },
+    importantCharacters: {
+      type: "array",
+      items: { type: "string" },
+      description: "Nombres y roles de figuras históricas clave.",
+    },
+    events: {
+      type: "array",
+      description: "Línea de tiempo de eventos significativos.",
+      items: {
+        type: "object",
+        properties: {
+          type: {
+            type: "string",
+            description:
+              "Categoría del evento (ej: 'foundation', 'war', 'treaty').",
+          },
+          date: {
+            type: "string",
+            description: "Fecha en formato ISO 8601 ($YYYY-MM-DD$).",
+          },
+          title: {
+            type: "string",
+            description: "Nombre del evento.",
+          },
+          description: {
+            type: "string",
+            description: "Explicación detallada de lo que ocurrió.",
+          },
+        },
+        required: ["type", "date", "title", "description"],
+      },
+    },
+  },
+  required: [
+    "name",
+    "historicalContext",
+    "historicalCuriosities",
+    "importantCharacters",
+    "events",
+  ],
+};
 
-  // Reemplazar comillas especiales por comillas dobles estándar
-  cleaned = cleaned.replace(/[""]/g, '"');
+const politicsSchema = {
+  type: Type.OBJECT,
+  properties: {
+    exterior: {
+      type: Type.OBJECT,
+      properties: {
+        geopolitics: {
+          type: Type.OBJECT,
+          properties: {
+            wars: {
+              type: Type.ARRAY,
+              description:
+                "Guerras y conflictos históricos o actuales de la nación",
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  opponent: {
+                    type: Type.STRING,
+                    description: "Nombre de la nación enemiga o histórica",
+                  },
+                  startDate: {
+                    type: Type.STRING,
+                    description: "Fecha o periodo de inicio del conflicto",
+                  },
+                  endDate: {
+                    type: Type.STRING,
+                    description:
+                      "Fecha o periodo de finalización del conflicto (null si está en curso)",
+                  },
+                  cause: {
+                    type: Type.STRING,
+                    description:
+                      "Causa de la guerra (coherente con historia/geografía/recursos)",
+                  },
+                  outcome: {
+                    type: Type.STRING,
+                    description:
+                      "Resultado del conflicto: victoria, derrota, empate, tratado específico, en curso",
+                  },
+                },
+                required: ["opponent", "startDate", "cause", "outcome"],
+              },
+            },
+            alliances: {
+              type: Type.ARRAY,
+              description: "Alianzas estratégicas con otras naciones",
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  nation: {
+                    type: Type.STRING,
+                    description: "Nombre de la nación aliada",
+                  },
+                  date: {
+                    type: Type.STRING,
+                    description: "Fecha o periodo de inicio de la alianza",
+                  },
+                  purpose: {
+                    type: Type.STRING,
+                    description:
+                      "Propósito de la alianza (defensivo, económico, cultural, contra enemigo común)",
+                  },
+                },
+                required: ["nation", "date", "purpose"],
+              },
+            },
+          },
+          required: ["wars", "alliances"],
+        },
+        influences: {
+          type: Type.ARRAY,
+          description:
+            "Impacto de potencias extranjeras en la soberanía y vida de la nación.",
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              originNation: {
+                type: Type.STRING,
+                description: "Nombre de la nación que ejerce la influencia.",
+              },
+              area: {
+                type: Type.STRING,
+                // Usamos una descripción que limite las opciones para guiar a Gemini
+                description:
+                  "Área afectada: Económica, Cultural, Militar, Política o Tecnológica.",
+              },
+              powerScore: {
+                type: Type.NUMBER,
+                description:
+                  "Intensidad de la influencia (0 a 100). Donde 100 es dependencia total.",
+              },
+              impactDescription: {
+                type: Type.STRING,
+                description:
+                  "Efecto específico (ej: 'Controla el 40% de las minas' o 'Su idioma es la segunda lengua').",
+              },
+              isPositive: {
+                type: Type.BOOLEAN,
+                description:
+                  "Determina si la influencia se percibe como beneficiosa o como una amenaza/imposición.",
+              },
+            },
+            required: [
+              "originNation",
+              "area",
+              "powerScore",
+              "impactDescription",
+              "isPositive",
+            ],
+          },
+        },
+      },
+      required: ["geopolitics", "influences"],
+    },
+    interior: {
+      type: Type.OBJECT,
+      properties: {
+        governmentType: {
+          type: Type.STRING,
+          description:
+            "Tipo de gobierno (Monarquía Absoluta/Constitucional, República Parlamentaria/Presidencialista, Teocracia, Oligarquía, Dictadura, etc.) - coherente con cultura e historia",
+        },
+        leader: {
+          type: Type.OBJECT,
+          description: "Información del líder actual de la nación",
+          properties: {
+            name: {
+              type: Type.STRING,
+              description: "Nombre del líder actual o figura principal",
+            },
+            title: {
+              type: Type.STRING,
+              description:
+                "Título oficial (Rey, Presidente, Sumo Sacerdote, Canciller, Emperador, etc.)",
+            },
+            rulingParty: {
+              type: Type.STRING,
+              description:
+                "Partido o facción gobernante (si aplica, o 'No aplica' para monarquías absolutas)",
+            },
+            succession: {
+              type: Type.STRING,
+              description:
+                "Sistema de sucesión: hereditaria, elección popular, elección indirecta, golpe de estado, designación religiosa, etc.",
+            },
+          },
+          required: ["name", "title", "rulingParty", "succession"],
+        },
+        legislativeBranch: {
+          type: Type.OBJECT,
+          description: "Información sobre el poder legislativo",
+          properties: {
+            name: {
+              type: Type.STRING,
+              description:
+                "Nombre del cuerpo legislativo (Parlamento, Senado, Consejo de Ancianos, Asamblea, Duma, etc.)",
+            },
+            structure: {
+              type: Type.STRING,
+              description:
+                "Estructura organizacional: unicameral, bicameral, consultivo, ceremonial, etc.",
+            },
+            powers: {
+              type: Type.STRING,
+              description:
+                "Poderes y responsabilidades (legislar, aprobar presupuestos, controlar al ejecutivo, declarar guerra, etc.)",
+            },
+          },
+          required: ["name", "structure", "powers"],
+        },
+        judicialBranch: {
+          type: Type.OBJECT,
+          description: "Información sobre el poder judicial",
+          properties: {
+            name: {
+              type: Type.STRING,
+              description:
+                "Nombre del sistema judicial (Corte Suprema, Tribunales Religiosos, Tribunal Constitucional, etc.)",
+            },
+            structure: {
+              type: Type.STRING,
+              description:
+                "Estructura organizacional: jerárquica, independiente, basada en ley común/civil/religiosa/consuetudinaria",
+            },
+            powers: {
+              type: Type.STRING,
+              description:
+                "Poderes y responsabilidades (interpretar leyes, juzgar disputas, revisión judicial, arbitraje, etc.)",
+            },
+          },
+          required: ["name", "structure", "powers"],
+        },
+        politicalStability: {
+          type: Type.STRING,
+          description:
+            "Nivel de estabilidad política: Alta, Media, Baja, Volátil - con justificación coherente",
+        },
+        politicalIdeology: {
+          type: Type.STRING,
+          description:
+            "Ideología política dominante: conservadurismo, liberalismo, socialismo, nacionalismo, teocrática, pragmática, etc.",
+        },
+        separatism: {
+          type: Type.ARRAY,
+          description:
+            "Movimientos separatistas (si existen, puede estar vacío)",
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              region: {
+                type: Type.STRING,
+                description:
+                  "Región con tendencias separatistas (coherente con geografía/cultura)",
+              },
+              demands: {
+                type: Type.STRING,
+                description:
+                  "Demandas del movimiento: independencia, autonomía, derechos culturales, etc.",
+              },
+              strength: {
+                type: Type.STRING,
+                description:
+                  "Fuerza del movimiento: Alta, Media, Baja, Latente, Violento, Pacífico",
+              },
+            },
+            required: ["region", "demands", "strength"],
+          },
+        },
+        tensions: {
+          type: Type.OBJECT,
+          description: "Tensiones internas en la nación",
+          properties: {
+            cultural: {
+              type: Type.ARRAY,
+              description: "Tensiones culturales entre grupos",
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  group: {
+                    type: Type.STRING,
+                    description:
+                      "Grupo cultural afectado (minoría étnica, grupo lingüístico, etc.)",
+                  },
+                  issue: {
+                    type: Type.STRING,
+                    description: "Problema específico del conflicto cultural",
+                  },
+                  severity: {
+                    type: Type.STRING,
+                    description: "Severidad del conflicto: Alta, Media, Baja",
+                  },
+                },
+                required: ["group", "issue", "severity"],
+              },
+            },
+            religious: {
+              type: Type.ARRAY,
+              description: "Tensiones religiosas entre grupos",
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  religion: {
+                    type: Type.STRING,
+                    description: "Religión o secta involucrada en el conflicto",
+                  },
+                  issue: {
+                    type: Type.STRING,
+                    description: "Problema específico del conflicto religioso",
+                  },
+                  severity: {
+                    type: Type.STRING,
+                    description: "Severidad del conflicto: Alta, Media, Baja",
+                  },
+                },
+                required: ["religion", "issue", "severity"],
+              },
+            },
+            political: {
+              type: Type.ARRAY,
+              description: "Tensiones políticas entre facciones o partidos",
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  party: {
+                    type: Type.STRING,
+                    description: "Partido o facción política involucrada",
+                  },
+                  issue: {
+                    type: Type.STRING,
+                    description:
+                      "Problema específico (ideológico, lucha por poder, corrupción, etc.)",
+                  },
+                  severity: {
+                    type: Type.STRING,
+                    description: "Severidad del conflicto: Alta, Media, Baja",
+                  },
+                },
+                required: ["party", "issue", "severity"],
+              },
+            },
+          },
+          required: ["cultural", "religious", "political"],
+        },
+      },
+      required: [
+        "governmentType",
+        "leader",
+        "legislativeBranch",
+        "judicialBranch",
+        "politicalStability",
+        "politicalIdeology",
+        "separatism",
+        "tensions",
+      ],
+    },
+  },
+  required: ["exterior", "interior"],
+};
 
-  // Eliminar comas finales en arrays y objetos (trailing commas)
-  cleaned = cleaned.replace(/,(\s*[\]}])/g, "$1");
+const economySchema = {
+  type: Type.OBJECT,
+  properties: {
+    economicSystem: {
+      type: Type.STRING,
+      description:
+        "Tipo de Sistema Económico (Capitalista de Mercado, Planificado Centralmente, Mixto, Feudal, Agrario, Gremial, etc. - coherente con política/cultura)",
+    },
+    keySectors: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          sectorName: {
+            type: Type.STRING,
+            description:
+              "Nombre del Sector Principal (Agricultura, Minería, Manufactura, Servicios, Tecnología, Turismo, etc.)",
+          },
+          importance: {
+            type: Type.STRING,
+            description: "Importancia Relativa: alta, media, baja",
+          },
+        },
+        required: ["sectorName", "importance"],
+      },
+    },
+    currency: {
+      type: Type.OBJECT,
+      properties: {
+        currencyName: {
+          type: Type.STRING,
+          description: "Nombre de la Moneda",
+        },
+        currencySymbol: {
+          type: Type.STRING,
+          description: "Símbolo de la Moneda (si existe, ej. $, €, ¥)",
+        },
+        stability: {
+          type: Type.STRING,
+          description: "Estabilidad de la Moneda: alta, media, baja, volátil",
+        },
+      },
+      required: ["currencyName", "currencySymbol", "stability"],
+    },
+    naturalResources: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          resourceName: {
+            type: Type.STRING,
+            description: "Nombre del Recurso Natural (coherente con geografía)",
+          },
+          abundance: {
+            type: Type.STRING,
+            description:
+              "Abundancia: abundante, moderado, escaso, sin explotar",
+          },
+        },
+        required: ["resourceName", "abundance"],
+      },
+    },
+    economicLaw: {
+      type: Type.OBJECT,
+      properties: {
+        propertyRights: {
+          type: Type.STRING,
+          description:
+            "Descripción de los Derechos de Propiedad (fuertes, débiles, estatales, comunales, mixtos)",
+        },
+        contractLaw: {
+          type: Type.STRING,
+          description:
+            "Descripción del Derecho Contractual (desarrollado, básico, basado en costumbre, influencia religiosa)",
+        },
+        taxSystem: {
+          type: Type.STRING,
+          description:
+            "Descripción del Sistema Fiscal (progresivo, regresivo, plano, tipos principales de impuestos: renta, consumo, corporativo, propiedad)",
+        },
+        regulationLevel: {
+          type: Type.STRING,
+          description:
+            "Nivel General de Regulación Económica: alto, medio, bajo, sector específico",
+        },
+      },
+      required: [
+        "propertyRights",
+        "contractLaw",
+        "taxSystem",
+        "regulationLevel",
+      ],
+    },
+    tradePolicy: {
+      type: Type.OBJECT,
+      properties: {
+        openness: {
+          type: Type.STRING,
+          description:
+            "Nivel de Apertura Comercial: abierta, proteccionista, mixta",
+        },
+        majorExports: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.STRING,
+            description: "Producto/Servicio Principal de Exportación",
+          },
+        },
+        majorImports: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.STRING,
+            description: "Producto/Servicio Principal de Importación",
+          },
+        },
+        tariffs: {
+          type: Type.STRING,
+          description:
+            "Política Arancelaria General: altos, bajos, selectivos, inexistentes",
+        },
+        tradeAgreements: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              partnerNation: {
+                type: Type.STRING,
+                description: "Nombre Nación Socia Comercial o Bloque",
+              },
+              agreementType: {
+                type: Type.STRING,
+                description:
+                  "Tipo de Acuerdo: libre comercio, unión aduanera, preferencial",
+              },
+            },
+            required: ["partnerNation", "agreementType"],
+          },
+        },
+      },
+      required: [
+        "openness",
+        "majorExports",
+        "majorImports",
+        "tariffs",
+        "tradeAgreements",
+      ],
+    },
+    infrastructure: {
+      type: Type.OBJECT,
+      properties: {
+        transportation: {
+          type: Type.STRING,
+          description:
+            "Nivel de Desarrollo del Transporte (desarrollado, en desarrollo, pobre, red específica: carreteras, ferrocarril, puertos)",
+        },
+        energy: {
+          type: Type.STRING,
+          description:
+            "Disponibilidad y Fuente de Energía (confiable, poco confiable, fuentes principales: fósil, renovable, nuclear, importada)",
+        },
+        communication: {
+          type: Type.STRING,
+          description:
+            "Nivel de Desarrollo de Comunicaciones (avanzado, básico, limitado, penetración de internet)",
+        },
+      },
+      required: ["transportation", "energy", "communication"],
+    },
+    wealthDistribution: {
+      type: Type.STRING,
+      description:
+        "Distribución de la Riqueza: muy desigual, moderadamente desigual, relativamente igualitaria",
+    },
+    economicStability: {
+      type: Type.STRING,
+      description:
+        "Estabilidad Económica General: estable, creciente, estancada, en declive, volátil",
+    },
+    inflationRate: {
+      type: Type.STRING,
+      description: "Tasa de Inflación Estimada: alta, media, baja, controlada",
+    },
+  },
+  required: [
+    "economicSystem",
+    "keySectors",
+    "currency",
+    "naturalResources",
+    "economicLaw",
+    "tradePolicy",
+    "infrastructure",
+    "wealthDistribution",
+    "economicStability",
+    "inflationRate",
+  ],
+};
 
-  // Manejar caracteres de escape en strings
-  cleaned = cleaned.replace(/\\\\"/g, '\\"');
+const populationSchema = {
+  type: Type.OBJECT,
+  properties: {
+    totalPopulation: {
+      type: Type.NUMBER,
+      description: "Número estimado de habitantes",
+    },
+    populationGrowthRate: {
+      type: Type.NUMBER,
+      description: "Tasa de crecimiento poblacional (ej. 1.5% anual)",
+    },
+    lifeExpectancy: {
+      type: Type.OBJECT,
+      properties: {
+        male: {
+          type: Type.NUMBER,
+          description: "Esperanza de vida para hombres",
+        },
+        female: {
+          type: Type.NUMBER,
+          description: "Esperanza de vida para mujeres",
+        },
+        overall: {
+          type: Type.NUMBER,
+          description: "Esperanza de vida general",
+        },
+      },
+      required: ["male", "female", "overall"],
+    },
+    ethnicGroups: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          groupName: {
+            type: Type.STRING,
+            description: "Nombre del grupo étnico",
+          },
+          percentage: {
+            type: Type.NUMBER,
+            description:
+              "Porcentaje de la población (Con este formato 0 a 100)",
+          },
+          notes: {
+            type: Type.STRING,
+            description: "Notas adicionales sobre el grupo",
+          },
+        },
+        required: ["groupName", "percentage", "notes"],
+      },
+    },
+    languages: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          languageName: {
+            type: Type.STRING,
+            description: "Nombre del idioma",
+          },
+          status: {
+            type: Type.STRING,
+            description:
+              "Estatus: oficial, regional, minoritario, lingua franca",
+          },
+          percentageSpeakers: {
+            type: Type.NUMBER,
+            description: "Porcentaje de hablantes (Con este formato 0 a 100)",
+          },
+        },
+        required: ["languageName", "status", "percentageSpeakers"],
+      },
+    },
+    religions: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          religionName: {
+            type: Type.STRING,
+            description: "Nombre conciso de la religión",
+          },
+          percentageAdherents: {
+            type: Type.NUMBER,
+            description: "Porcentaje de seguidores (Con este formato 0 a 100)",
+          },
+          influence: {
+            type: Type.STRING,
+            description: "Nivel de influencia: alto, medio, bajo",
+          },
+        },
+        required: ["religionName", "percentageAdherents", "influence"],
+      },
+    },
+    urbanRuralSplit: {
+      type: Type.OBJECT,
+      properties: {
+        urbanPercentage: {
+          type: Type.NUMBER,
+          description:
+            "Porcentaje de población urbana (Con este formato 0 a 100)",
+        },
+        ruralPercentage: {
+          type: Type.NUMBER,
+          description:
+            "Porcentaje de población rural (Con este formato 0 a 100)",
+        },
+        majorCities: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.STRING,
+            description: "Nombre de ciudad principal",
+          },
+        },
+      },
+      required: ["urbanPercentage", "ruralPercentage", "majorCities"],
+    },
+    ageDistribution: {
+      type: Type.OBJECT,
+      properties: {
+        medianAge: {
+          type: Type.NUMBER,
+          description: "Edad mediana de la población",
+        },
+        ageBrackets: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              bracket: {
+                type: Type.STRING,
+                description: "Rango de edad (ej. 0-14 años)",
+              },
+              percentage: {
+                type: Type.NUMBER,
+                description:
+                  "Porcentaje en este rango (Con este formato 0 a 100)",
+              },
+            },
+            required: ["bracket", "percentage"],
+          },
+        },
+      },
+      required: ["medianAge", "ageBrackets"],
+    },
+    educationLevel: {
+      type: Type.STRING,
+      description:
+        "Descripción general del nivel educativo y sistema educativo",
+    },
+    literacyRate: {
+      type: Type.NUMBER,
+      description: "Tasa de alfabetización (Con este formato 0 a 100)",
+    },
+    populationDensity: {
+      type: Type.NUMBER,
+      description: "Densidad de población (habitantes por km²)",
+    },
+    health: {
+      type: Type.OBJECT,
+      properties: {
+        infantMortalityRate: {
+          type: Type.NUMBER,
+          description:
+            "Tasa de mortalidad infantil por 1000 nacidos vivos (Con este formato 0 a 100)",
+        },
+        accessToHealthcare: {
+          type: Type.STRING,
+          description:
+            "Nivel de acceso a la atención médica: bueno, moderado, pobre",
+        },
+      },
+      required: ["infantMortalityRate", "accessToHealthcare"],
+    },
+    migration: {
+      type: Type.OBJECT,
+      properties: {
+        immigrationRate: {
+          type: Type.NUMBER,
+          description:
+            "Porcentaje de la población total que es inmigrante (Con este formato 0 a 100)",
+        },
+        emigrationRate: {
+          type: Type.NUMBER,
+          description:
+            "Porcentaje de la población total que emigra (Con este formato 0 a 100)",
+        },
+        mainOriginsDestinations: {
+          type: Type.STRING,
+          description: "Principales países de origen y destino migratorio",
+        },
+      },
+      required: [
+        "immigrationRate",
+        "emigrationRate",
+        "mainOriginsDestinations",
+      ],
+    },
+    workforceDistribution: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          sector: {
+            type: Type.STRING,
+            description:
+              "Sector económico (Agricultura, Industria, Servicios, etc.)",
+          },
+          percentage: {
+            type: Type.NUMBER,
+            description:
+              "Porcentaje de la fuerza laboral en este sector (Con este formato 0 a 100)",
+          },
+          dominantProfessions: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.STRING,
+              description: "Profesión dominante en el sector",
+            },
+          },
+        },
+        required: ["sector", "percentage", "dominantProfessions"],
+      },
+    },
+    socialClasses: {
+      type: Type.STRING,
+      description:
+        "Descripción de la estructura de clases sociales y sus características",
+    },
+  },
+  required: [
+    "totalPopulation",
+    "populationGrowthRate",
+    "lifeExpectancy",
+    "ethnicGroups",
+    "languages",
+    "religions",
+    "urbanRuralSplit",
+    "ageDistribution",
+    "educationLevel",
+    "literacyRate",
+    "populationDensity",
+    "health",
+    "migration",
+    "workforceDistribution",
+    "socialClasses",
+  ],
+};
 
-  // Manejar caracteres de nueva línea no escapados dentro de strings
-  cleaned = cleaned.replace(/([":]\s*"[^"]*?)[\n\r]+([^"]*?")/g, "$1\\n$2");
+const nationConfig = {
+  temperature: 0.5,
+  topP: 0.9,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: "application/json",
+  _responseJsonSchema: nationSchema,
+  systemInstruction: nationSystemInstruction,
+};
 
-  try {
-    // Intentar parsear para verificar si es válido
-    JSON.parse(cleaned);
-    console.log("✅ JSON parseado correctamente en primer intento");
-    return cleaned;
-  } catch (error) {
-    console.error("❌ Error al parsear JSON limpiado:", error.message);
-    // Añadir lógica de recuperación para casos específicos
+const warConfig = {
+  temperature: 0.2,
+  topP: 0.9,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: "application/json",
+  _responseJsonSchema: warSchema,
+  systemInstruction: warSystemInstruction,
+};
 
-    // Contador para evitar bucles infinitos
-    let attempts = 0;
-    const maxAttempts = 5;
-    let lastError = error;
-
-    while (attempts < maxAttempts) {
-      attempts++;
-      console.log(`🔄 Intento de reparación ${attempts}/${maxAttempts}`);
-
-      try {
-        // Si el error es una cadena no terminada
-        if (error.message.includes("Unterminated string")) {
-          // Buscar la posición del error
-          if (error.message.includes("position")) {
-            const position = parseInt(error.message.match(/position (\d+)/)[1]);
-            console.log(
-              `Reparando cadena no terminada en posición ${position}`,
-            );
-
-            // Buscar la última comilla antes de la posición del error
-            let lastQuotePos = -1;
-            for (let i = position; i >= 0; i--) {
-              if (cleaned[i] === '"' && (i === 0 || cleaned[i - 1] !== "\\")) {
-                lastQuotePos = i;
-                break;
-              }
-            }
-
-            if (lastQuotePos !== -1) {
-              // Cerrar la cadena insertando una comilla
-              cleaned =
-                cleaned.substring(0, position) +
-                '"' +
-                cleaned.substring(position);
-              console.log(`Cadena cerrada en posición ${position}`);
-            }
-          }
-        }
-
-        // Si el error es sobre una posición específica
-        if (error.message.includes("position")) {
-          const position = parseInt(error.message.match(/position (\d+)/)[1]);
-          console.log(`Intentando reparar JSON en posición ${position}`);
-
-          // Buscar comillas sin escapar dentro de strings cerca de la posición del error
-          const before = cleaned.substring(
-            Math.max(0, position - 50),
-            position,
-          );
-          const after = cleaned.substring(
-            position,
-            Math.min(cleaned.length, position + 50),
-          );
-          console.log(
-            `Contexto alrededor del error: "${before}<<<ERROR>>>${after}"`,
-          );
-
-          // Escapar comillas dentro de strings
-          let segment = cleaned.substring(
-            Math.max(0, position - 100),
-            Math.min(cleaned.length, position + 100),
-          );
-          if (segment.includes('"')) {
-            // Encontrar la posición de la última cita de apertura antes del error
-            let inString = false;
-            let escapedSegment = "";
-            for (let i = 0; i < segment.length; i++) {
-              let c = segment[i];
-
-              // Si encontramos una comilla no escapada
-              if (c === '"' && (i === 0 || segment[i - 1] !== "\\")) {
-                inString = !inString;
-              }
-
-              // Si estamos dentro de una cadena y encontramos una comilla sin escapar que no es la comilla de cierre
-              if (
-                inString &&
-                c === '"' &&
-                i > 0 &&
-                segment[i - 1] !== "\\" &&
-                i < segment.length - 1
-              ) {
-                escapedSegment += "\\";
-              }
-
-              escapedSegment += c;
-            }
-
-            // Reemplazar el segmento
-            cleaned =
-              cleaned.substring(0, Math.max(0, position - 100)) +
-              escapedSegment +
-              cleaned.substring(Math.min(cleaned.length, position + 100));
-          }
-        }
-
-        // Intentar parsear de nuevo
-        JSON.parse(cleaned);
-        console.log(`Reparación exitosa en el intento ${attempts}`);
-        return cleaned;
-      } catch (newError) {
-        // Almacenar el nuevo error para el próximo intento
-        lastError = newError;
-        console.error(`Intento ${attempts} falló: ${newError.message}`);
-      }
-    }
-
-    console.warn(
-      `No se pudo reparar después de ${maxAttempts} intentos. Aplicando limpieza de emergencia.`,
-    );
-
-    // Último recurso: limpieza agresiva
-    // 1. Eliminar caracteres de control
-    cleaned = cleaned.replace(/[\u0000-\u001F]+/g, "");
-
-    // 2. Intentar cerrar todas las cadenas no terminadas
-    let inString = false;
-    let balance = 0;
-    let newCleaned = "";
-
-    for (let i = 0; i < cleaned.length; i++) {
-      const char = cleaned[i];
-      newCleaned += char;
-
-      // Comprobar comillas
-      if (char === '"' && (i === 0 || cleaned[i - 1] !== "\\")) {
-        inString = !inString;
-      }
-    }
-
-    // Si quedamos dentro de una cadena al final, cerrarla
-    if (inString) {
-      newCleaned += '"';
-    }
-
-    cleaned = newCleaned;
-
-    // 3. Equilibrar corchetes y llaves
-    try {
-      JSON.parse(cleaned);
-      return cleaned;
-    } catch (finalError) {
-      console.error(`Limpieza de emergencia falló: ${finalError.message}`);
-      throw new Error(
-        `No se pudo reparar el JSON después de múltiples intentos: ${finalError.message}`,
-      );
-    }
-  }
-}
-
-async function generateNationGemini(
-  nationConcept,
-  governmentType,
-  age,
-  optionalPrompt,
-) {
-  console.log(`🧠 [Gemini] Iniciando generación de nación básica...`);
-  console.log(
-    `🧠 [Gemini] Parámetros: ${nationConcept}, ${governmentType}, ${age}`,
-  );
-
-  const prompt = nationPromptTemplate
-    .replace("{{nationConcept}}", nationConcept)
-    .replace("{{governmentType}}", governmentType)
-    .replace("{{age}}", age);
-
+export async function generateNation(nationConcept, governmentType, age) {
   const chat = genAI.chats.create({
     model: geminiModel,
     config: {
-      ...generationConfig,
-      systemInstruction: nationSystemInstruction,
+      ...nationConfig,
     },
   });
 
-  console.log(`🧠 [Gemini] Generando información básica de la nación...`);
   const result1 = await chat.sendMessage({
-    message: prompt,
+    message: `Genera una nación: ${nationConcept}, gobierno: ${governmentType}, era: ${age}`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: nationSchema,
+    },
   });
-  const json1 = JSON.parse(cleanJsonResponse(result1.text));
-  console.log(`✅ [Gemini] Información básica generada: ${json1.name}`);
+  const nation = JSON.parse(result1.text);
 
-  console.log(`🧠 [Gemini] Generando detalles políticos...`);
   const result2 = await chat.sendMessage({
-    message: politicsDetailsPrompt,
+    message: `Basándote en este JSON: ${nation}, genera detalles políticos detallados.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: politicsSchema,
     },
   });
-  const json2 = JSON.parse(cleanJsonResponse(result2.text));
-  console.log(
-    `✅ [Gemini] Detalles políticos generados: ${json2.governmentType}`,
-  );
+  const politics = JSON.parse(result2.text);
 
-  console.log(`🧠 [Gemini] Generando detalles económicos...`);
   const result3 = await chat.sendMessage({
-    message: economicDetailsPrompt,
+    message: `Para este JSON ${nation} ${politics} con gobierno ${governmentType}, genera la economía.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: economySchema,
     },
   });
-  const json3 = JSON.parse(cleanJsonResponse(result3.text));
-  console.log(
-    `✅ [Gemini] Detalles económicos generados: Sistema ${json3.economicSystem}`,
-  );
+  const economy = JSON.parse(result3.text);
 
-  console.log(`🧠 [Gemini] Generando detalles demográficos...`);
   const result4 = await chat.sendMessage({
-    message: populationDetailsPrompt,
+    message: `Para ${nation} ${politics} ${economy}, genera demografía coherente.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: populationSchema,
     },
   });
-  const cleanedJsonString4 = cleanJsonResponse(result4.text);
-  const json4 = JSON.parse(cleanedJsonString4);
-  console.log(
-    `✅ [Gemini] Detalles demográficos generados: Población ${json4.populationSize}`,
-  );
+  const population = JSON.parse(result4.text);
 
-  json1.politicsDetails = json2;
-  json1.economyDetails = json3;
-  json1.populationDetails = json4;
-
-  console.log(`🧠 [Gemini] Ensamblando JSON completo de la nación...`);
-  let updatedJsonStr = JSON.stringify(json1, null, 2);
-  console.log(`✅ [Gemini] Generación de nación básica completada`);
-  return updatedJsonStr;
+  return {
+    ...nation,
+    politicsDetails: politics,
+    economyDetails: economy,
+    populationDetails: population,
+  };
 }
 
-async function generateNationAdvancedGemini(
+export async function generateWar(aggressor, defender, casusBelli, age) {
+  const result = await genAI.models.generateContent({
+    model: geminiModel,
+    contents: `Genera una simulación de guerra histórica con estas identidades:
+                - Agresor: ${aggressor}
+                - Defensor: ${defender}
+                - Era: ${age}
+                - Motivo: ${casusBelli}
+                IMPORTANTE: RESPETA EL STRUCTURED OUTPUT Y LA ESTRUCTURA OFRECIDA
+                `,
+    config: warConfig,
+  });
+
+  const war = JSON.parse(result.text);
+
+  return war;
+}
+
+/*export async function generateNationAdvanced(
   nationConcept,
   governmentType,
   age,
@@ -307,224 +1165,23 @@ async function generateNationAdvancedGemini(
   populationGrowth,
   other,
 ) {
-  console.log(`🧠 [Gemini] Iniciando generación de nación avanzada...`);
-  console.log(
-    `🧠 [Gemini] Parámetros principales: ${nationConcept}, ${governmentType}, ${age}`,
-  );
-  console.log(
-    `🧠 [Gemini] Parámetros adicionales: Líder=${leaderName}, Estabilidad=${politicalStability}, Economía=${economicSystem}`,
-  );
-
-  const prompt = nationAdvancedPromptTemplate
-    .replace("{{nationConcept}}", nationConcept)
-    .replace("{{governmentType}}", governmentType)
-    .replace("{{age}}", age)
-    .replace("{{leaderName}}", leaderName)
-    .replace("{{politicalStability}}", politicalStability)
-    .replace("{{economicSystem}}", economicSystem)
-    .replace("{{currencyName}}", currencyName)
-    .replace("{{wealthDistribution}}", wealthDistribution)
-    .replace("{{lifeExpectancy}}", lifeExpectancy)
-    .replace("{{populationGrowth}}", populationGrowth)
-    .replace("{{other}}", other);
-
-  // Detalles básicos usando structured output
-  console.log(
-    `🧠 [Gemini] Generando información básica de la nación avanzada...`,
-  );
-
-  const chat = genAI.chats.create({
+  console.log(`🧠 Iniciando generación de nación avanzada...`);
+  const response = await genAI.models.generateContent({
     model: geminiModel,
-    config: {
-      ...generationConfig,
-      systemInstruction: nationSystemInstructionAdvanced,
-    },
+    config: nationConfig,
+    contents: nationAdvancedPromptTemplate
+      .replace("{{nationConcept}}", nationConcept || "Aleatoria")
+      .replace("{{governmentType}}", governmentType || "Aleatorio")
+      .replace("{{age}}", age || "Aleatoria")
+      .replace("{{leaderName}}", leaderName || "Aleatoria")
+      .replace("{{politicalStability}}", politicalStability || "Aleatoria")
+      .replace("{{economicSystem}}", economicSystem || "Aleatoria")
+      .replace("{{currencyName}}", currencyName || "Aleatoria")
+      .replace("{{wealthDistribution}}", wealthDistribution || "Aleatoria")
+      .replace("{{lifeExpectancy}}", lifeExpectancy || "Aleatoria")
+      .replace("{{populationGrowth}}", populationGrowth || "Aleatoria")
+      .replace("{{other}}", other || "Aleatoria"),
   });
-
-  const result1 = await chat.sendMessage({
-    message: prompt,
-  });
-  const json1 = JSON.parse(cleanJsonResponse(result1.text));
-
-  console.log(
-    `✅ [Gemini] Información básica avanzada generada: ${json1.name}`,
-  );
-
-  // Política usando structured output
-  console.log(`🧠 [Gemini] Generando detalles políticos avanzados...`);
-  const result2 = await chat.sendMessage({
-    message: politicsDetailsPrompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: politicsSchema,
-    },
-  });
-  const json2 = JSON.parse(cleanJsonResponse(result2.text));
-  console.log(
-    `✅ [Gemini] Detalles políticos avanzados generados: ${json2.governmentType}`,
-  );
-
-  // Economía usando structured output
-  console.log(`🧠 [Gemini] Generando detalles económicos avanzados...`);
-  const result3 = await chat.sendMessage({
-    message: economicDetailsPrompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: economySchema,
-    },
-  });
-  const json3 = JSON.parse(cleanJsonResponse(result3.text));
-  console.log(
-    `✅ [Gemini] Detalles económicos avanzados generados: Sistema ${json3.economicSystem}, Moneda: ${json3.currencyName}`,
-  );
-
-  // Demografía usando structured output
-  console.log(`🧠 [Gemini] Generando detalles demográficos avanzados...`);
-  const result4 = await chat.sendMessage({
-    message: populationDetailsPrompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: populationSchema,
-    },
-  });
-  const cleanedJsonString4 = cleanJsonResponse(result4.text);
-  const json4 = JSON.parse(cleanedJsonString4);
-  console.log(
-    `✅ [Gemini] Detalles demográficos avanzados generados: Población ${json4.populationSize}, Esperanza de vida: ${json4.lifeExpectancy}`,
-  );
-
-  json1.politicsDetails = json2;
-  json1.economyDetails = json3;
-  json1.populationDetails = json4;
-
-  console.log(`🧠 [Gemini] Ensamblando JSON completo de la nación avanzada...`);
-  let updatedJsonStr = JSON.stringify(json1, null, 2);
-  console.log(`✅ [Gemini] Generación de nación avanzada completada`);
-  return updatedJsonStr;
+  return response.text;
 }
-
-async function generateNationRandomGemini() {
-  console.log(`🧠 [Gemini] Iniciando generación de nación aleatoria...`);
-  console.log(`🧠 [Gemini] Usando plantilla para generación aleatoria`);
-
-  const prompt = nationRandomPromptTemplate;
-
-  // Detalles básicos usando structured output
-  console.log(`🧠 [Gemini] Generando información básica aleatoria...`);
-
-  const chat = genAI.chats.create({
-    model: geminiModel,
-    config: {
-      ...generationConfig,
-      systemInstruction: nationRandomPromptTemplate,
-    },
-  });
-
-  const result1 = await chat.sendMessage({
-    message: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: nationSchema,
-    },
-  });
-  const json1 = JSON.parse(cleanJsonResponse(result1.text));
-
-  console.log(
-    `✅ [Gemini] Información básica aleatoria generada: ${json1.name}`,
-  );
-  console.log(
-    `🎲 [Gemini] Contexto histórico aleatorio generado de ${json1.historicalContext.length} caracteres`,
-  );
-
-  // Política usando structured output
-  console.log(`🧠 [Gemini] Generando detalles políticos aleatorios...`);
-  const result2 = await chat.sendMessage({
-    message: politicsDetailsPrompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: politicsSchema,
-    },
-  });
-  const json2 = JSON.parse(cleanJsonResponse(result2.text));
-  console.log(
-    `✅ [Gemini] Detalles políticos aleatorios generados: ${json2.governmentType}, Estabilidad: ${json2.politicalStability}`,
-  );
-
-  // Economía usando structured output
-  console.log(`🧠 [Gemini] Generando detalles económicos aleatorios...`);
-  const result3 = await chat.sendMessage({
-    message: economicDetailsPrompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: economySchema,
-    },
-  });
-  const json3 = JSON.parse(cleanJsonResponse(result3.text));
-  console.log(
-    `✅ [Gemini] Detalles económicos aleatorios generados: Sistema ${json3.economicSystem}, Moneda: ${json3.currencyName}`,
-  );
-
-  // Demografía usando structured output
-  console.log(`🧠 [Gemini] Generando detalles demográficos aleatorios...`);
-  const result4 = await chat.sendMessage({
-    message: populationDetailsPrompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: populationSchema,
-    },
-  });
-  const cleanedJsonString4 = cleanJsonResponse(result4.text);
-  const json4 = JSON.parse(cleanedJsonString4);
-  console.log(
-    `✅ [Gemini] Detalles demográficos aleatorios generados: Población ${json4.populationSize}, Crecimiento: ${json4.populationGrowth}`,
-  );
-
-  console.log(
-    `🧩 [Gemini] Combinando todas las partes de la nación aleatoria...`,
-  );
-  json1.politicsDetails = json2;
-  json1.economyDetails = json3;
-  json1.populationDetails = json4;
-
-  console.log(
-    `🧠 [Gemini] Ensamblando JSON completo de la nación aleatoria...`,
-  );
-  let updatedJsonStr = JSON.stringify(json1, null, 2);
-  console.log(`✅ [Gemini] Generación de nación aleatoria completada`);
-  return updatedJsonStr;
-}
-
-async function generateWarGemini(
-  nationA,
-  nationB,
-  casusBelli,
-  age,
-  optionalPrompt,
-) {
-  const prompt =
-    optionalPrompt ||
-    warPromptTemplate
-      .replace("{{nationA}}", nationA)
-      .replace("{{nationB}}", nationB)
-      .replace("{{casusBelli}}", casusBelli)
-      .replace("{{age}}", age);
-
-  // Usando structured output
-  const result = await warModel.generateContent({
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: {
-      ...generationConfig,
-      response_schema: warSchema,
-    },
-  });
-
-  const json = getStructuredResponse(result.response);
-  return JSON.stringify(json, null, 2);
-}
-
-export {
-  generateNationGemini,
-  generateNationAdvancedGemini,
-  generateNationRandomGemini,
-  generateWarGemini,
-};
+*/

@@ -1,8 +1,8 @@
-import express from 'express';
-import { createWarGemini, getWars } from '../controllers/warController.js';
+import express from "express";
+import { createWar } from "../controllers/warController.js";
+
 const router = express.Router();
 
-router.post('/', createWarGemini);
-router.get('/', getWars);
+router.post("/", createWar);
 
 export default router;

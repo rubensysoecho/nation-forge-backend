@@ -1,41 +1,54 @@
-import { generateWarGemini } from '../config/gemini.js';
+import { generateWar } from "../config/gemini.js";
 
-const createWarGemini = async (req, res) => {
-    try {
-        console.log(`⚔️ Generando conflicto (Peace was never an option...) - Gemini ...`)
-        const warString = await generateWarGemini(req.body.nationA, req.body.nationB, req.body.casusBelli, req.body.age, req.body.optionalPrompt);
-        const warJSON = JSON.parse(warString);
-        const newWar = new War({
-            ...warJSON,
-            creator: req.body.userId
-        });
-        const savedWar = await newWar.save();
-        res.send({ msg: "War created successfully", war: savedWar });
-    } catch (error) {
-        console.log(error);
-        res.send(
-            { msg: "Error creating nation" }
-        );
-    }
-}
+export const createWar = async (req, res) => {
+  try {
+    console.log(`⚔️ Iniciando generación de guerra...`);
+    const { aggressor, defender, casusBelli, age } = req.body;
+    var warString = await generateWar(aggressor, defender, casusBelli, age);
 
-const getWars = async (req, res) => {
-    try {
-        const userId = req.query.userId; // Obtiene el userId de los query parameters
-
-        if (!userId) {
-            return res.status(400).send({ msg: "userId is required in query parameters" });
-        }
-
-        const wars = await War.find({ creator: userId }); // Filtra por userId
-        res.send(wars);
-    } catch (error) {
-        console.error(error); // Usa console.error para errores
-        res.status(500).send({ msg: "Error retrieving wars", error: error.message }); // Añade el mensaje de error
-    }
+    const warJson = warString;
+    res.send(warJson);
+    console.log(`⚔️✅ Guerra creada`);
+  } catch (error) {
+    console.error(`❌ Error al crear guerra:`, error);
+    res.send({ msg: "Error creating war" });
+  }
 };
 
-export {
-    createWarGemini,
-    getWars
-}
+/*const createNationAdvanced = async (req, res) => {
+  try {
+    const {
+      nationConcept,
+      governmentType,
+      age,
+      leaderName,
+      politicalStability,
+      economicSystem,
+      currencyName,
+      wealthDistribution,
+      lifeExpectancy,
+      populationGrowth,
+      other,
+    } = req.body;
+
+    var nationString = await generateNationAdvanced(
+      nationConcept,
+      governmentType,
+      age,
+      leaderName,
+      politicalStability,
+      economicSystem,
+      currencyName,
+      wealthDistribution,
+      lifeExpectancy,
+      populationGrowth,
+      other,
+    );
+
+    const nationJson = JSON.parse(nationString);
+    res.send(nationJson);
+  } catch (error) {
+    console.error(`❌ Error al crear nación:`, error);
+    res.send({ msg: "Error creating nation" });
+  }
+};*/
